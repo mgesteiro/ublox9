@@ -9,5 +9,5 @@ Created on 27 Nov 2020
 @author: mgesteiro
 """
 MSG_NMEA = 2
-MSG_UBX  = 3
+MSG_UBX = 3
 MSG_RTCM = 4
