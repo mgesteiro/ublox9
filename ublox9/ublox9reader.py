@@ -34,22 +34,24 @@ class ublox9Reader:
             return (type, message)
         raise StopIteration
 
-    def readMessage(self) -> (int, bytes):
+    def readMessage(self, maxsearchbytes=8192) -> (int, bytes):
         """
         Reads data from the stream and returns the next available message,
         in a tuple with format (type, data).
-        If no more items are available (EOF) a (None, None) message is returned.
+        If no more items are available (== EOF) a (None, None) message is returned.
         This method assumes a couple of pre-conditions:
         1. we start from the beginning (i.e. not in the middle of a message)
         2. every message is complete and atomic (i.e. no interleaving supported)
-        Non-expected data is ignored and skipped
+        Non-expected data is ignored and skipped up to a maximum of maxsearchbytes
+        :param maxsearchbytes:
         :return (type:, message:)
         """
 
         s = self._stream
 
+        rembytes = maxsearchbytes # remaining bytes to read
         b = s.read(1) # first byte
-        while len(b) > 0:
+        while (rembytes > 0) & (len(b) > 0):
             if b == b'$':
                 # possible NMEA message
                 # https://www.u-blox.com/en/docs/UBX-18010854#page=19
@@ -86,9 +88,11 @@ class ublox9Reader:
                 # unknown or unexpected byte
                 b = s.read(1)  # read next
                 # return (ublox9.MSG_RTCM, xxx)
+            rembytes -= 1
 
         # if we reach here, no valid message was found
         return (None, None)
+
 
     def readUBXMessage(self, discardlimit=10) -> (int, bytes):
         """
