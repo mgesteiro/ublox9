@@ -36,9 +36,10 @@ class ublox9Reader:
 
     def readMessage(self) -> (int, bytes):
         """
-        Reads data from the stream and delivers the next available message
-        Tries to recognize the type of message and returns it.
-        It assumes a couple of pre-conditions:
+        Reads data from the stream and returns the next available message,
+        in a tuple with format (type, data).
+        If no more items are available (EOF) a (None, None) message is returned.
+        This method assumes a couple of pre-conditions:
         1. we start from the beginning (i.e. not in the middle of a message)
         2. every message is complete and atomic (i.e. no interleaving supported)
         Non-expected data is ignored and skipped
@@ -58,7 +59,7 @@ class ublox9Reader:
                 # field,field,field
                 # *HH - checksum '*' + 2 hex digits
                 # \r\n - ending
-                return (ublox9.MSG_NMEA, s.readline())
+                return (ublox9.MSG_NMEA, b + s.readline())
             elif b == b'\xb5':
                 # possible UBX message
                 # https://www.u-blox.com/en/docs/UBX-18010854#page=44
@@ -88,3 +89,23 @@ class ublox9Reader:
 
         # if we reach here, no valid message was found
         return (None, None)
+
+    def readUBXMessage(self, discardlimit=10) -> (int, bytes):
+        """
+        Gets the next UBX message from the stream, discarding all
+        previous messages up to a limit of discardlimit.
+        Returns an UBX message or (None, None) if the limit is reached
+        or there are no more messages available.
+        discardlimit is 10 by default, use 0 to remove this limit.
+        :params discardlimit: int:
+        :return (type:, message:)
+        """
+        discarded = 0
+        m = self.readMessage()
+        while m[0] not in {None, ublox9.MSG_UBX}:
+            discarded += 1
+            if (discardlimit > 0) & (discarded >= discardlimit):
+                return (None, None)
+            m = self.readMessage()
+
+        return m
