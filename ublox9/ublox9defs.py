@@ -1,5 +1,5 @@
 """
-ublox9 globals and constants
+ublox9 globals and constants definitions
 
 Based on the ZED-F9P u-blox GNSS receiver documentation:
 https://www.u-blox.com/en/docs/UBX-18010854

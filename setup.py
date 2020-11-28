@@ -5,7 +5,7 @@ Created on 28 Nov 2020
 """
 import setuptools
 
-from ublox9 import version as VERSION
+from ublox9 import VERSION
 
 with open("README.md", "r") as f:
     long_description = f.read()

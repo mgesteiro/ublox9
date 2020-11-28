@@ -1,3 +1,4 @@
+# pylint: disable=fixme, line-too-long
 """
 ublox9Reader class.
 
@@ -8,11 +9,9 @@ Created on 27 Nov 2020
 
 @author: mgesteiro
 """
+from ublox9.ublox9defs import MSG_NMEA, MSG_UBX
 
-import ublox9
-
-
-class ublox9Reader:
+class Ublox9Reader:
     """
     ublox9Reader class.
     """
@@ -30,9 +29,9 @@ class ublox9Reader:
 
     def __next__(self) -> (int, bytes):
         """Returns next item in iteration."""
-        (type, message) = self.readMessage()
+        (mtype, mdata) = self.read_message()
         if type is not None:
-            return (type, message)
+            return (mtype, mdata)
         raise StopIteration
 
     @property
@@ -42,7 +41,7 @@ class ublox9Reader:
         """
         return self._stream
 
-    def readMessage(self, maxsearchbytes=1024) -> (int, bytes):
+    def read_message(self, maxsearchbytes=1024) -> (int, bytes):
         """
         Reads data from the stream and returns the next available message,
         in a tuple with format (type, data).
@@ -55,12 +54,12 @@ class ublox9Reader:
         :return (type:, message:)
         """
 
-        s = self._stream
+        stream = self._stream
 
         rembytes = maxsearchbytes  # remaining bytes to read
-        b = s.read(1)  # first byte
-        while (rembytes > 0) & (len(b) > 0):
-            if b == b"$":
+        read_byte = stream.read(1)  # first byte
+        while (rembytes > 0) & (len(read_byte) > 0):
+            if read_byte == b"$":
                 # possible NMEA message
                 # https://www.u-blox.com/en/docs/UBX-18010854#page=19
                 # TT - Talker identifier (2) GP, GL, GA, GB, GQ, GN
@@ -69,8 +68,8 @@ class ublox9Reader:
                 # field,field,field
                 # *HH - checksum '*' + 2 hex digits
                 # \r\n - ending
-                return (ublox9.MSG_NMEA, b + s.readline())
-            elif b == b"\xb5":
+                return (MSG_NMEA, read_byte + stream.readline())
+            if read_byte == b"\xb5":
                 # possible UBX message
                 # https://www.u-blox.com/en/docs/UBX-18010854#page=44
                 # \x62
@@ -79,11 +78,11 @@ class ublox9Reader:
                 # Length(2)
                 # payload (Length)
                 # CKACKB(2)
-                header = b + s.read(5)
+                header = read_byte + stream.read(5)
                 plen = int.from_bytes(header[-2:], "little", signed=False)
-                rest = s.read(plen + 2)
-                return (ublox9.MSG_UBX, header + rest)
-            elif b == b"\xf5":
+                rest = stream.read(plen + 2)
+                return (MSG_UBX, header + rest)
+            if read_byte == b"\xf5":
                 # possible RTCM message
                 # https://www.u-blox.com/en/docs/UBX-18010854#page=161
                 # ID(1)
@@ -91,17 +90,17 @@ class ublox9Reader:
                 # bitfield0(2) (includes numData)
                 # data(numData)
                 # crc(3)
-                b = s.read(1)  # not handled yet
-            else:
-                # unknown or unexpected byte
-                b = s.read(1)  # read next
-                # return (ublox9.MSG_RTCM, xxx)
+                # return (MSG_RTCM, xxx)
+                pass  # not handled yet
+
+            # unknown or unexpected byte
+            read_byte = stream.read(1)  # read next
             rembytes -= 1
 
         # if we reach here, no valid message was found
         return (None, None)
 
-    def readUBXMessage(self, discardlimit=10, maxsearchbytes=512) -> (int, bytes):
+    def read_ubxmessage(self, discardlimit=10, maxsearchbytes=512) -> (int, bytes):
         """
         Gets the next UBX message from the stream, discarding all
         previous messages up to a limit of discardlimit.
@@ -113,11 +112,11 @@ class ublox9Reader:
         :return (type:, message:)
         """
         discarded = 0
-        m = self.readMessage()
-        while m[0] not in {None, ublox9.MSG_UBX}:
+        message = self.read_message()
+        while message[0] not in {None, MSG_UBX}:
             discarded += 1
             if (discardlimit > 0) & (discarded >= discardlimit):
                 return (None, None)
-            m = self.readMessage(maxsearchbytes=maxsearchbytes)
+            message = self.read_message(maxsearchbytes=maxsearchbytes)
 
-        return m
+        return message

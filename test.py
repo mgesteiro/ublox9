@@ -4,11 +4,11 @@ import serial, ublox9
 
 print("ublox9 message dumping demo:\nstarting ...\n")
 
-s = serial.Serial("/dev/tty.usbserial-A50285BI", 115200, timeout=1)
-r = ublox9.ublox9Reader(s)
+sport = serial.Serial("/dev/tty.usbserial-A50285BI", 115200, timeout=1)
+ureader = ublox9.Ublox9Reader(sport)
 
 try:
-    for message in r:
+    for message in ureader:
         print(message)
 except:
     pass
