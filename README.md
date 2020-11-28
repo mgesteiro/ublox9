@@ -4,7 +4,7 @@
 Based on the [ZED-F9P (u-blox F9 high precision GNSS receiver) documentation](https://www.u-blox.com/en/docs/UBX-18010854).
 
 ## INSTALL
-`pip install https://github.com/mgesteiro/ublox9.git`
+`pip install https://github.com/mgesteiro/ublox9/archive/main.zip`
 
 ## LICENSE
 This work is licensed under the [GNU Affero General Public License v3.0](LICENSE).
