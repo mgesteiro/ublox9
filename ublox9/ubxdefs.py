@@ -659,7 +659,7 @@ CFG_NMEA_PROTVER = {  # Table 24
     "V41": 41,  # NMEA protocol version 4.10 (not available in all products)
     "V411": 42,  # NMEA protocol version 4.11 (not available in all products)
 }
-CFG_NMEA_MAXSVS = { Table 25
+CFG_NMEA_MAXSVS = {  # Table 25
     "UNLIM": 0,  # Unlimited
     "8SVS": 8,  # 8 SVs
     "12SVS": 12,  # 12 SVs
@@ -751,7 +751,7 @@ CFG_UART1_DATABITS = {  # Table 54, Table 60
     "SEVEN": 1,  # 7 databits
 }
 CFG_UART1_PARITY = {  # Table 55, Table 61
-    "NONE": 0  # No parity bit
+    "NONE": 0,  # No parity bit
     "ODD": 1,  # Add an odd parity bit
     "EVEN": 2,  # Add an even parity bit
 }
