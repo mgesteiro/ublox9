@@ -562,8 +562,8 @@ CFG_NAVHPG = {
     "CFG-NAVHPG-DGNSSMODE", b"\x20\x14\x00\x11",  # E1 - - Differential corrections mode. See Table 18 below for a list of possible constants for this item.
 }
 CFG_NAVHPG_DGNSSMODE = {  # Table 18
-    RTK_FLOAT: 2,  # No attempts made to fix ambiguities
-    RTK_FIXED: 3,  # Ambiguities are fixed whenever possible
+    "RTK_FLOAT": 2,  # No attempts made to fix ambiguities
+    "RTK_FIXED": 3,  # Ambiguities are fixed whenever possible
 }
 
 # CFG-NAVSPG: Standard precision navigation configuration
@@ -602,27 +602,27 @@ CFG_NAVSPG = {
     "CFG-NAVSPG-CONSTR_DGNSSTO", b"\x20\x11\x00\xc4",  # U1 - s DGNSS timeout
 }
 CFG_NAVSPG_FIXMODE = {  #Table 20
-    2DONLY: 1,  # 2D only
-    3DONLY: 2,  # 3D only
-    AUTO: 3,  # Auto 2D/3D
+    "2DONLY": 1,  # 2D only
+    "3DONLY": 2,  # 3D only
+    "AUTO": 3,  # Auto 2D/3D
 }
 CFG_NAVSPG_UTCSTANDARD = {  #Table 21
-    AUTO: 0,  # Automatic; receiver selects based on GNSS configuration
-    USNO: 3,  # UTC as operated by the U.S. Naval Observatory (USNO); derived from GPS time
-    EU: 5,  # UTC as combined from multiple European laboratories; derived from Galileo time
-    SU: 6,  # UTC as operated by the former Soviet Union (SU); derived from GLONASS time
-    NTSC: 7,  # UTC as operated by the National Time Service Center (NTSC), China; derived from BeiDou time
+    "AUTO": 0,  # Automatic; receiver selects based on GNSS configuration
+    "USNO": 3,  # UTC as operated by the U.S. Naval Observatory (USNO); derived from GPS time
+    "EU": 5,  # UTC as combined from multiple European laboratories; derived from Galileo time
+    "SU": 6,  # UTC as operated by the former Soviet Union (SU); derived from GLONASS time
+    "NTSC": 7,  # UTC as operated by the National Time Service Center (NTSC), China; derived from BeiDou time
 }
 CFG_NAVSPG_DYNMODEL = {  # Table 22
-    PORT: 0,  # Portable
-    STAT: 2,  # Stationary
-    PED: 3,  # Pedestrian
-    AUTOMOT: 4,  # Automotive
-    SEA: 5,  # Sea
-    AIR1: 6,  # Airborne with <1g acceleration
-    AIR2: 7,  # Airborne with <2g acceleration
-    AIR4: 8,  # Airborne with <4g acceleration
-    WRIST: 9,  # Wrist-worn watch (not available in all products)
+    "PORT": 0,  # Portable
+    "STAT": 2,  # Stationary
+    "PED": 3,  # Pedestrian
+    "AUTOMOT": 4,  # Automotive
+    "SEA": 5,  # Sea
+    "AIR1": 6,  # Airborne with <1g acceleration
+    "AIR2": 7,  # Airborne with <2g acceleration
+    "AIR4": 8,  # Airborne with <4g acceleration
+    "WRIST": 9,  # Wrist-worn watch (not available in all products)
 }
 
 # CFG-NMEA: NMEA protocol configuration
@@ -653,34 +653,34 @@ CFG_NMEA = {
     "CFG-NMEA-BDSTALKERID", b"\x30\x93\x00\x33",  # U2 - - BeiDou Talker ID. Sets the two ASCII characters that should be used for the BeiDou Talker ID. If these are set to zero, the default BeiDou Talker ID will be used.
 }
 CFG_NMEA_PROTVER = {  # Table 24
-    V21: 21,  # NMEA protocol version 2.1
-    V23: 23,  # NMEA protocol version 2.3
-    V40: 40,  # NMEA protocol version 4.0 (not available in all products)
-    V41: 41,  # NMEA protocol version 4.10 (not available in all products)
-    V411: 42,  # NMEA protocol version 4.11 (not available in all products)
+    "V21": 21,  # NMEA protocol version 2.1
+    "V23": 23,  # NMEA protocol version 2.3
+    "V40": 40,  # NMEA protocol version 4.0 (not available in all products)
+    "V41": 41,  # NMEA protocol version 4.10 (not available in all products)
+    "V411": 42,  # NMEA protocol version 4.11 (not available in all products)
 }
 CFG_NMEA_MAXSVS = { Table 25
-    UNLIM: 0,  # Unlimited
-    8SVS: 8,  # 8 SVs
-    12SVS: 12,  # 12 SVs
-    16SVS: 16,  # 16 SVs
+    "UNLIM": 0,  # Unlimited
+    "8SVS": 8,  # 8 SVs
+    "12SVS": 12,  # 12 SVs
+    "16SVS": 16,  # 16 SVs
 }
 CFG_NMEA_SVNUMBERING = {  # Table 26
-    STRICT: 0,  # Strict - satellites are not output
-    EXTENDED: 1,  # Extended - use proprietary numbering
+    "STRICT": 0,  # Strict - satellites are not output
+    "EXTENDED": 1,  # Extended - use proprietary numbering
 }
 CFG_NMEA_MAINTALKERID = {  # Table 27
-    AUTO: 0,  # Main Talker ID is not overridden
-    GP: 1,  # Set main Talker ID to 'GP'
-    GL: 2,  # Set main Talker ID to 'GL'
-    GN: 3,  # Set main Talker ID to 'GN'
-    GA: 4,  # Set main Talker ID to 'GA' (not available in all products)
-    GB: 5,  # Set main Talker ID to 'GB' (not available in all products)
-    GQ: 7,  # Set main Talker ID to 'GQ' (not available in all products)
+    "AUTO": 0,  # Main Talker ID is not overridden
+    "GP": 1,  # Set main Talker ID to 'GP'
+    "GL": 2,  # Set main Talker ID to 'GL'
+    "GN": 3,  # Set main Talker ID to 'GN'
+    "GA": 4,  # Set main Talker ID to 'GA' (not available in all products)
+    "GB": 5,  # Set main Talker ID to 'GB' (not available in all products)
+    "GQ": 7,  # Set main Talker ID to 'GQ' (not available in all products)
 }
 CFG_NMEA_GSVTALKERID = {  # Table 28
-    GNSS: 0,  # Use GNSS-specific Talker ID (as defined by NMEA)
-    MAIN: 1,  # Use the main Talker ID
+    "GNSS": 0,  # Use GNSS-specific Talker ID (as defined by NMEA)
+    "MAIN": 1,  # Use the main Talker ID
 }
 
 # CFG-RATE: Navigation and measurement rate configuration
@@ -692,11 +692,11 @@ CFG_RATE = {
     "CFG-RATE-TIMEREF", b"\x20\x21\x00\x03",  # E1 - - Time system to which measurements are aligned. See Table 33 below for a list of possible constants for this item.
 }
 CFG_RATE_TIMEREF = {  # Table 33
-    UTC : 0,  # Align measurements to UTC time
-    GPS : 1,  # Align measurements to GPS time
-    GLO : 2,  # Align measurements to GLONASS time
-    BDS : 3,  # Align measurements to BeiDou time
-    GAL : 4,  # Align measurements to Galileo time
+    "UTC ": 0,  # Align measurements to UTC time
+    "GPS ": 1,  # Align measurements to GPS time
+    "GLO ": 2,  # Align measurements to GLONASS time
+    "BDS ": 3,  # Align measurements to BeiDou time
+    "GAL ": 4,  # Align measurements to Galileo time
 }
 
 # CFG-TMODE: Time mode configuration
@@ -721,13 +721,13 @@ CFG_TMODE = {
     "CFG-TMODE-SVIN_ACC_LIMIT", b"\x40\x03\x00\x11",  # U4 0.1 mm Survey-in position accuracy limit. This will only be used if CFG-TMODE-MODE=SURVEY_IN.
 }
 CFG_TMODE_MODE = { # Table 44
-    DISABLED: 0,  # Disabled
-    SURVEY_IN: 1,  # Survey in
-    FIXED: 2,  # Fixed mode (true ARP position information required)
+    "DISABLED": 0,  # Disabled
+    "SURVEY_IN": 1,  # Survey in
+    "FIXED": 2,  # Fixed mode (true ARP position information required)
 }
 CFG_TMODE_POS_TYPE = {  # Table 45
-    ECEF: 0,  # Position is ECEF
-    LLH: 1,  # Position is Lat/Lon/Height
+    "ECEF": 0,  # Position is ECEF
+    "LLH": 1,  # Position is Lat/Lon/Height
 }
 
 # CFG-UART1: Configuration of the UART1 interface
@@ -741,19 +741,19 @@ CFG_UART1 = {
     "CFG-UART1-ENABLED", b"\x10\x52\x00\x05"  # L - - Flag to indicate if the UART1 should be enabled
 }
 CFG_UART1_STOPBITS = {  # Table 53, Table 59
-    HALF: 0,  # 0.5 stopbits
-    ONE: 1,  # 1.0 stopbits
-    ONEHALF: 2,  # 1.5 stopbits
-    TWO: 3,  # 2.0 stopbits
+    "HALF": 0,  # 0.5 stopbits
+    "ONE": 1,  # 1.0 stopbits
+    "ONEHALF": 2,  # 1.5 stopbits
+    "TWO": 3,  # 2.0 stopbits
 }
 CFG_UART1_DATABITS = {  # Table 54, Table 60
-    EIGHT: 0,  # 8 databits
-    SEVEN: 1,  # 7 databits
+    "EIGHT": 0,  # 8 databits
+    "SEVEN": 1,  # 7 databits
 }
 CFG_UART1_PARITY = {  # Table 55, Table 61
-    NONE: 0  # No parity bit
-    ODD: 1,  # Add an odd parity bit
-    EVEN: 2,  # Add an even parity bit
+    "NONE": 0  # No parity bit
+    "ODD": 1,  # Add an odd parity bit
+    "EVEN": 2,  # Add an even parity bit
 }
 
 # CFG-UART1INPROT: Input protocol configuration of the UART1 interface
