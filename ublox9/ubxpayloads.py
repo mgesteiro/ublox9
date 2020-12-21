@@ -81,6 +81,26 @@ UBX_PAYLOADS = {
         "headVeh": I4,  # 84 1e-5 deg Heading   of   vehicle   (2-D),   this   is   only   valid   when headVehValid is set, otherwise the output is set to the heading of motion
         "magDec": I2,  # 88 1e-2 deg Magnetic declination. Only supported in ADR 4.10 and later.
         "magAcc": U2,  # 90 1e-2 deg Magnetic declination accuracy. Only supported in ADR 4.10 and later.
-    }
+    },
+
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=141&zoom=auto,-70,719
+    "UBX-NAV-SVIN": {
+        "version " : U1,  # 0 - - - Message version (0x00 for this version)
+        "reserved0" : 3,   # 1 - U1[3] - - Reserved
+        "iTOW " : U4,  # 4 - - ms GPS time of week of the  navigation epoch. See the  description of iTOW  for details.
+        "dur " : U4,  # 8 - - s Passed survey-in observation time
+        "meanX " : I4,  # 12 - - cm Current survey-in mean position ECEF X coordinate
+        "meanY " : I4,  # 16 - - cm Current survey-in mean position ECEF Y coordinate
+        "meanZ " : I4,  # 20 - - cm Current survey-in mean position ECEF Z coordinate
+        "meanXHP " : I1,  # 24 - - 0.1_mm Current high-precision survey-in mean position ECEF X coordinate. Must be in the range -99..+99. The    current    survey-in    mean    position    ECEF    X coordinate, in units of cm, is given by meanX + (0.01 * meanXHP)
+        "meanYHP " : I1,  # 25 - - 0.1_mm Current high-precision survey-in mean position ECEF Y coordinate. Must be in the range -99..+99. The    current    survey-in    mean    position    ECEF    Y coordinate, in units of cm, is given by meanY + (0.01 * meanYHP)
+        "meanZHP " : I1,  # 26 - - 0.1_mm Current high-precision survey-in mean position ECEF Z coordinate. Must be in the range -99..+99. The    current    survey-in    mean    position    ECEF    Z coordinate, in units of cm, is given by meanZ + (0.01 * meanZHP)
+        "reserved1 " : U1,  # 27 - - - Reserved
+        "meanAcc " : U4,  # 28 - - 0.1_mm Current survey-in mean position accuracy
+        "obs " : U4,  # 32 - - - Number of position observations used during survey- in
+        "valid " : U1,  # 36 - - - Survey-in position validity flag, 1 = valid, otherwise 0
+        "active " : U1,  # 37 - - - Survey-in in progress flag, 1 = in-progress, otherwise 0
+        "reserved2" : 2,   # 38 - U1[2] - - Reserved
+    },
 
 }

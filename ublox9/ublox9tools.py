@@ -14,8 +14,10 @@ from ublox9 import Ublox9Stream, UBXMessage
 from ublox9.ubxdefs import UBX_CFG
 from serial import Serial, SerialException, SerialTimeoutException
 
+
 class StreamToTCP:
     """docstring for StreamToSocket"""
+
     def __init__(self, address, timeout=1):
         # super(StreamToSocket, self).__init__()
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,19 +40,23 @@ class StreamToTCP:
 def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
     """
     try to open serialport with different baudrates and check that there is
-    valid communication with the ublox module using the MON-VER message.
+    valid communication with the ublox module using the UBX-SEC-UNIQID message.
+
+    if a valid connection is achieved, the id property of the resulting object
+    is populated with the u-blox module UNIQID.
 
     returns: an Ublox9Stream if successfull, None otherwise
     """
-    MON_VER = b'\xb5\x62\x0a\x04\x00\x00\x0e\x34'
+    unique = b"\xB5\x62\x27\x03\x00\x00\x2A\xA5"
     for baudrate in baudrates:
         try:
             sport = Serial(serialport, baudrate, timeout=timeout)
-            blx9s = Ublox9Stream(sport)
-            blx9s.write_message(MON_VER)
-            answ = blx9s.read_ubxmessage(discardlimit=12, maxsearchbytes=90)
+            ub9stream = Ublox9Stream(sport)
+            ub9stream.write_message(unique)
+            answ = ub9stream.read_ubxmessage(discardlimit=12, maxsearchbytes=90)
             if answ[1]:
-                return blx9s
+                ub9stream.id = answ[1][10:15]
+                return ub9stream
             else:
                 sport.close()
                 time.sleep(0.250)
@@ -58,16 +64,17 @@ def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
             pass
     return None
 
-def gen_valset_message(layer: bytes, cfgData: bytes) -> bytes:
+
+def gen_valset_message(layers: bytes, cfgData: bytes) -> bytes:
     """
     creates an UBX-VALSET message with the specified values/keys of cfgData
-    to be written in the specified layer layers
+    to be written to the specified layers
 
-    param: layer: at which layer(s) should be written the config
+    param: layers: which layers should be written the config to
     param: cfgData: the bundle of keys and values
     returns: the VALSET message ready to be sent
     """
     VERSION = b"\x00"
     RESERVED0 = b"\x00\x00"
-    payload = VERSION + layer + RESERVED0 + cfgData
+    payload = VERSION + layers + RESERVED0 + cfgData
     return UBXMessage(UBX_CFG["UBX-CFG-VALSET"], payload).message_bytes()

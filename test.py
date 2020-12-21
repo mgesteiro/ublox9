@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
-import serial, ublox9
+import serial
+from ublox9.ublox9stream import Ublox9Stream
 
 print("ublox9 message dumping demo:\nstarting ...\n")
 
-sport = serial.Serial("/dev/tty.usbserial-A50285BI", 115200, timeout=1)
-ureader = ublox9.Ublox9Reader(sport)
-
 try:
-    for message in ureader:
+    # sport = serial.Serial("/dev/tty.usbserial-A50285BI", 115200, timeout=1)
+    sport = serial.Serial("/dev/cu.usbmodem14301", 115200, timeout=1)
+    ubs9 = Ublox9Stream(sport)
+    for message in ubs9:
         print(message)
-except:
-    pass
+except (serial.SerialException, KeyboardInterrupt) as ex:
+    print(ex)
 
 print("\nfinished!\n")

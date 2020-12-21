@@ -20,6 +20,7 @@ class Ublox9Stream:
         :params stream: stream with read()/readline()/write() methods
         """
         self._stream = stream
+        self._id = b''
 
     def __iter__(self):
         """
@@ -33,7 +34,7 @@ class Ublox9Stream:
         """
         (mtype, mdata) = self.read_message()
         if type is not None:
-            return (mtype, mdata)
+            return mtype, mdata
         raise StopIteration
 
     @property
@@ -42,6 +43,20 @@ class Ublox9Stream:
         Getter for the base stream object
         """
         return self._stream
+
+    @property
+    def id(self) -> bytes:
+        """
+        Getter for the stream identifier
+        """
+        return self._id
+
+    @id.setter
+    def id(self, newid: bytes):
+        """
+        Setter for the stream identifier
+        """
+        self._id = newid
 
     def read_message(self, maxsearchbytes=128) -> (int, bytes):
         """
@@ -54,7 +69,6 @@ class Ublox9Stream:
         :param maxsearchbytes: 128 by default
         :return (int:, bytes:)
         """
-
         rembytes = maxsearchbytes  # remaining bytes to read
         read_byte = self._stream.read(1)  # first byte
         while (rembytes > 0) and (read_byte):
@@ -109,9 +123,9 @@ class Ublox9Stream:
         Returns an UBX message or (None, None) if the limit is reached
         or there are no more messages available.
         discardlimit is 12 by default, use 0 to remove this limit.
-        :param discardlimit: max number of messages to discard before returning
-        :param maxsearchbytes: as needed by read_message(). 128 by default.
-        :return (type:, message:)
+        :param: discardlimit: max number of messages to discard before returning
+        :param: maxsearchbytes: as needed by read_message(). 128 by default.
+        :return: (type:, message:)
         """
         discarded = 0
         message = self.read_message()
