@@ -6,6 +6,7 @@ UBXMessage class
 from ublox9.ubxdefs import *
 from ublox9.ubxpayloads import UBX_PAYLOADS
 
+
 class UBXMessage:
     """Class to fiddle with UBX messages"""
 
@@ -29,7 +30,7 @@ class UBXMessage:
         be sent through any stream.
         :return message: bytes:
         """
-        base =  self._class_id + self._plen + self._payload
+        base = self._class_id + self._plen + self._payload
         return self.SIGNATURE + base + self.calc_checksum(base)
 
     @staticmethod
@@ -61,18 +62,35 @@ class UBXMessage:
         """
         for mclass in UBX_CLASSID_SET:
             for name in mclass:
-                if mclass[name] == classid: return (name, mclass)
-        return ("", None)
+                if mclass[name] == classid: return name, mclass
+        return "", None
 
     @staticmethod
-    def parse_bytes(content: bytes) -> bytes:
-        if type(content) != bytes: return None
-        if content[0:2] != UBXMessage.SIGNATURE: return None
-        mdef = UBXMessage.get_classid_def(content[2:4])
-        if mdef[0] == "": return None
+    def parse_bytes(content: bytes) -> dict:
+        """
+        Parse the UBX message in content. Only simple validations.
+        :param content: the complete message bytes
+        :return: the parsed message in a dict, empty if fails/invalid
+        """
         result = {}
+        if type(content) != bytes: return result
+        if content[0:2] != UBXMessage.SIGNATURE: return result
+        mdef = UBXMessage.get_classid_def(content[2:4])
+        if mdef[0] == "": return result  # unrecognized message definition
         index = 6  # start from the payload initial byte
         for attribute, size in UBX_PAYLOADS[mdef[0]].items():
-            result[attribute] = content[index : index + size]
-            index += size
+            if type(size) == int:
+                # simple type
+                result[attribute] = content[index: index + size]
+                index += size
+            elif type(size) == tuple:
+                # groups
+                if size[0] == "N":
+                    # fixed width fields of size[1] size
+                    for i in range(int((len(content)-2-index)/size[1])):
+                        result[attribute+f"{i}"] = content[index: index + size[1]]
+                        index += size[1]
+                elif size[0] == "R":
+                    # rest of the payload
+                    result[attribute] = content[index: len(content)-2]
         return result

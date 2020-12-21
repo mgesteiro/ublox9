@@ -16,13 +16,16 @@ X4 = 4  # 32-bit little-endian bitfield n/a n/a
 R4 = 4  # IEEE 754 single (32-bit) precision -2^127...2^127 ~ value·2 -24
 R8 = 8  # IEEE 754 double (64-bit) precision -2^1023...2^1023 ~ value·2 -53
 CH = 1  # ASCII / ISO 8859-1 char (8-bit) n/a n/a
-#U:n unsigned bitfield value of  n  bits width var. variable variable
-#I:n signed (two's complement) bitfield value of  n  bits width var. variable variable
-#S:n signed bitfield value of  n  bits width, in sign (most significant bit) and magnitude (remaining bits) notation var. variable variable
+# U:n unsigned bitfield value of  n  bits width var. variable variable
+# I:n signed (two's complement) bitfield value of  n  bits width var. variable variable
+# S:n signed bitfield value of  n  bits width, in sign (most significant bit) and magnitude (remaining bits) notation var. variable variable
 
 # 3.3.7 UBX repeated fields
 # https://www.u-blox.com/en/docs/UBX-18010854#page=46&zoom=auto,-70,468
-GROUPS_LENGTH = ("known", "variable")
+GROUPS_LENGTH = [
+    "N",  # N fixed length groups
+    "R",  # Rest of the payload
+]
 
 # 1.5.2 GNSS identifiers
 # https://www.u-blox.com/en/docs/UBX-18010854#page=16&zoom=auto,-70,377
@@ -43,7 +46,7 @@ UBX_PAYLOADS = {
         "version": U1,
         "layers": X1,
         "reserved0": 2,  # U1[2]
-        "cfgData" : (GROUPS_LENGTH[1], {"data": U1})
+        "cfgData": ("R", U1)
     },
 
     # https://www.u-blox.com/en/docs/UBX-18010854#page=132&zoom=auto,-70,545
@@ -101,6 +104,20 @@ UBX_PAYLOADS = {
         "valid " : U1,  # 36 - - - Survey-in position validity flag, 1 = valid, otherwise 0
         "active " : U1,  # 37 - - - Survey-in in progress flag, 1 = in-progress, otherwise 0
         "reserved2" : 2,   # 38 - U1[2] - - Reserved
+    },
+
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=155&zoom=auto,-70,346
+    "UBX-SEC-UNIQID": {
+        "version": U1,  # 0 U1 - - Message version (0x01 for this version)
+        "reserved0": 3,  # 1 U1[3] - - Reserved
+        "uniqueId": 5,  # 4 U1[5] - - Unique chip ID
+    },
+
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=125&zoom=auto,-70,616
+    "UBX-MON-VER": {
+        "swVersion": 30,  # 0 CH[30] - - Nul-terminated software version string.
+        "hwVersion": 10,  # 30 CH[10] - - Nul-terminated hardware version string
+        "extension": ("N", 30),  # 40 + n·30 CH[30] - - Extended software information strings. A series of nul-terminated strings. Each extension field is 30 characters long and contains varying software information. Not all extension fields may appear. Examples of reported information: the software version string of the underlying ROM (when the receiver's firmware is running from flash), the firmware version, the supported protocol version, the module identifier, the flash information structure (FIS) file information, the supported major GNSS, the supported augmentation systems. See Firmware and protocol versions for details.
     },
 
 }
