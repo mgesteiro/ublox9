@@ -27,13 +27,12 @@ class Ublox9Stream:
         """
         return self
 
-    def __next__(self) -> (int, bytes):
+    def __next__(self) -> bytes:
         """
         Returns next item in iteration.
         """
-        (mtype, mdata) = self.read_message()
-        if type is not None:
-            return mtype, mdata
+        mdata = self.read_message()
+        if mdata: return mdata
         raise StopIteration
 
     @property
