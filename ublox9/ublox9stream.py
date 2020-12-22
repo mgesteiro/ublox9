@@ -5,7 +5,6 @@ Created on 27 Nov 2020
 
 @author: mgesteiro
 """
-from ublox9.ublox9defs import MSG_NMEA, MSG_UBX
 
 
 class Ublox9Stream:
@@ -58,16 +57,13 @@ class Ublox9Stream:
         """
         self._id = newid
 
-    def read_message(self, maxsearchbytes=128) -> (int, bytes):
+    def read_message(self, maxsearchbytes=128) -> bytes:
         """
-        Reads data from the stream and returns the next available message,
-        in a tuple with format (type, data).
-        If no more items are available (== EOF) a (None, None) message is returned.
+        Reads data from the stream and returns the next available message.
         This method assumes that every message is complete and atomic (i.e. no
-        interleaving supported). Non-expected data is ignored and skipped up to a
-        maximum of maxsearchbytes.
-        :param maxsearchbytes: 128 by default
-        :return (int:, bytes:)
+        interleaving supported).
+        :param maxsearchbytes: max number of non-expected bytes to ignore/skip
+        :return: the message read. Empty if EOF or any other problem
         """
         rembytes = maxsearchbytes  # remaining bytes to read
         read_byte = self._stream.read(1)  # first byte
@@ -82,7 +78,7 @@ class Ublox9Stream:
                 # field,field,field...
                 # *HH - checksum '*' + 2 hex digits
                 # \r\n - ending
-                return (MSG_NMEA, read_byte + self._stream.readline(255))
+                return read_byte + self._stream.readline(255)
 
             if read_byte == b"\xb5":
                 # possible UBX message
@@ -96,7 +92,7 @@ class Ublox9Stream:
                 header = read_byte + self._stream.read(5)
                 plen = int.from_bytes(header[-2:], "little", signed=False)
                 rest = self._stream.read(plen + 2)
-                return (MSG_UBX, header + rest)
+                return header + rest
 
             if read_byte == b"\xf5":
                 # possible RTCM message
@@ -114,30 +110,28 @@ class Ublox9Stream:
             rembytes -= 1
 
         # if we reach here, no valid message was found
-        return (None, None)
+        return b""
 
-    def read_ubxmessage(self, discardlimit=12, maxsearchbytes=128) -> (int, bytes):
+    def read_ubxmessage(self, discardlimit=12, maxsearchbytes=128) -> bytes:
         """
-        Gets the next UBX message from the stream, discarding all
-        previous non UBX messages up to a limit of discardlimit.
-        Returns an UBX message or (None, None) if the limit is reached
-        or there are no more messages available.
-        discardlimit is 12 by default, use 0 to remove this limit.
-        :param: discardlimit: max number of messages to discard before returning
-        :param: maxsearchbytes: as needed by read_message(). 128 by default.
-        :return: (type:, message:)
+        Gets the next UBX message from the stream, discarding all previous non
+        UBX messages up to the provided limit.
+        :param discardlimit: max non-ubx messages to discard before returning.
+            12 by default, use 0 to remove this limit.
+        :param maxsearchbytes: as needed by read_message(). 128 by default.
+        :return: the following UBX message or empty if the limit is reached or
+            there are no more messages available.
         """
         discarded = 0
         message = self.read_message()
-        while message[0] not in {None, MSG_UBX}:
+        while message and (message[0:1] != b"\xb5"):
             discarded += 1
             if (discardlimit > 0) & (discarded >= discardlimit):
-                return (None, None)
+                return b""
             message = self.read_message(maxsearchbytes=maxsearchbytes)
-
         return message
 
-    def write_message(self, message):
+    def write_message(self, message: bytes):
         """
         Writes the bytes directly to the stream. No checks performed.
         :param message: the bytes to be sent

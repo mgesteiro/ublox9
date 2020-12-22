@@ -11,12 +11,13 @@ Created on 9 Dec 2020
 import socket
 import time
 from ublox9 import Ublox9Stream, UBXMessage
+from ublox9.ublox9defs import MSG_NMEA, MSG_UBX, MSG_RTCM
 from ublox9.ubxdefs import UBX_CFG
 from serial import Serial, SerialException, SerialTimeoutException
 
 
 class StreamToTCP:
-    """docstring for StreamToSocket"""
+    """docstring for StreamToTCP"""
 
     def __init__(self, address, timeout=1):
         # super(StreamToSocket, self).__init__()
@@ -39,13 +40,14 @@ class StreamToTCP:
 
 def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
     """
-    try to open serialport with different baudrates and check that there is
-    valid communication with the ublox module using the UBX-SEC-UNIQID message.
-
+    try to open a serial port with different baudrates and check that there is
+    a valid communication with the ublox module (sending UBX-SEC-UNIQID message)
     if a valid connection is achieved, the id property of the resulting object
     is populated with the u-blox module UNIQID.
-
-    returns: an Ublox9Stream if successfull, None otherwise
+    :param serialport: the device port to open
+    :param baudrates: a list of baudrates to try
+    :param timeout: timeout in seconds
+    :return: an Ublox9Stream if successfull, None otherwise
     """
     unique = b"\xB5\x62\x27\x03\x00\x00\x2A\xA5"
     for baudrate in baudrates:
@@ -54,27 +56,37 @@ def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
             ub9stream = Ublox9Stream(sport)
             ub9stream.write_message(unique)
             answ = ub9stream.read_ubxmessage(discardlimit=12, maxsearchbytes=90)
-            if answ[1]:
-                ub9stream.id = answ[1][10:15]
+            if answ:
+                ub9stream.id = answ[10:15]
                 return ub9stream
             else:
                 sport.close()
                 time.sleep(0.250)
         except (SerialException, SerialTimeoutException, ValueError):
             pass
-    return None
 
 
-def gen_valset_message(layers: bytes, cfgData: bytes) -> bytes:
+def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
     """
     creates an UBX-VALSET message with the specified values/keys of cfgData
     to be written to the specified layers
-
-    param: layers: which layers should be written the config to
-    param: cfgData: the bundle of keys and values
-    returns: the VALSET message ready to be sent
+    :param layers: which layers should be written the config to
+    :param cfg_data: the bundle of keys and values
+    :return: the VALSET message ready to be sent
     """
-    VERSION = b"\x00"
-    RESERVED0 = b"\x00\x00"
-    payload = VERSION + layers + RESERVED0 + cfgData
+    version = b"\x00"
+    reserved0 = b"\x00\x00"
+    payload = version + layers + reserved0 + cfg_data
     return UBXMessage(UBX_CFG["UBX-CFG-VALSET"], payload).message_bytes()
+
+
+def get_message_type(message: bytes) -> int:
+    """
+    Returns the type of the message
+    :param message: the message to classify
+    :return: the message type
+    """
+    firstbye = message[0:1]
+    if firstbye == b"$": return MSG_NMEA
+    if firstbye == b"\xb5": return MSG_UBX
+    if firstbye == b"\xf5": return MSG_RTCM

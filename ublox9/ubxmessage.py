@@ -12,23 +12,22 @@ class UBXMessage:
 
     SIGNATURE = b"\xb5\x62"
 
-    def __init__(self, Class_ID, payload=b""):
+    def __init__(self, class_id: bytes, payload: bytes =b""):
         """
         Constructor
-        Creates an UBXMessage object with the provided data
-        :param Class_ID: bytes: message Class and ID
-        :param payload: bytes: content of the message
-        reference at https://www.u-blox.com/en/docs/UBX-18010854#page=44
+        Creates an UBXMessage object with the provided data.
+        Reference at https://www.u-blox.com/en/docs/UBX-18010854#page=44
+        :param class_id: message Class and ID
+        :param payload: content of the message
         """
-        self._class_id = Class_ID
+        self._class_id = class_id
         self._payload = payload
         self._plen = len(payload).to_bytes(2, byteorder="little", signed=False)
 
     def message_bytes(self) -> bytes:
         """
-        Returns the binary (bytes) representation of the message, ready to
-        be sent through any stream.
-        :return message: bytes:
+        Returns the binary representation of the message, ready to be sent.
+        :return: the message bytes
         """
         base = self._class_id + self._plen + self._payload
         return self.SIGNATURE + base + self.calc_checksum(base)
@@ -36,33 +35,30 @@ class UBXMessage:
     @staticmethod
     def calc_checksum(content: bytes) -> bytes:
         """
-        Calculates and returns the checksum bytes for the content
+        Calculates and returns the checksum bytes for the content.
         :param content: bytes:
-        :return checksum: bytes:
+        :return: the checksum
         """
         check_a = 0
         check_b = 0
-
         for char in content:
             check_a += char
             check_a &= 0xFF
             check_b += check_a
             check_b &= 0xFF
-
         return bytes((check_a, check_b))
 
     @staticmethod
-    def get_classid_def(classid: bytes) -> (str, dict):
+    def get_classid_def(class_id: bytes) -> (str, dict):
         """
         Retrieves the definition (name/key and container) corresponding to
-        the provided classid
-
-        params: classid: the ubx message bytes of the Class and ID
+        the provided classid.
+        :param class_id: the ubx message bytes of the Class and ID
         returns: (name,dict), ("", None) if not found
         """
         for mclass in UBX_CLASSID_SET:
             for name in mclass:
-                if mclass[name] == classid: return name, mclass
+                if mclass[name] == class_id: return name, mclass
         return "", None
 
     @staticmethod
