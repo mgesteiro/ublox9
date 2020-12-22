@@ -41,6 +41,26 @@ GNSS_IDENTFIERS = {
 
 
 UBX_PAYLOADS = {
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=52&zoom=auto,-70,314
+    "UBX-ACK-ACK": {
+        "clsID": U1,  # 0 U1 - - Class ID of the Acknowledged Message
+        "msgID": U1,  # 1 U1 - - Message ID of the Acknowledged Message
+    },
+
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=53&zoom=auto,-70,719
+    "UBX-ACK-NACK": {
+        "clsID": U1,  # 0 U1 - - Class ID of the Not-Acknowledged Message
+        "msgID": U1,  # 1 U1 - - Message ID of the Not-Acknowledged Message
+    },
+
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=85&zoom=auto,-70,164
+    "UBX-CFG-VALGET": {
+        "version": U1,  # 0 U1 - - Message version (0x01 for this version)
+        "layer": U1,  # 1 U1 - - The  layer  from  which  the  configuration  item  was retrieved: • 0 - RAM layer • 1 - BBR • 2 - Flash • 7 - Default
+        "position": U2, # 2 U2 - - Number  of  configuration  items  skipped  in  the  result set  before  constructing  this  message  (mirrors  the equivalent field in the request message)
+        "cfgData": ("R", U1) # 4 + n U1  - - Configuration data  (key and value pairs) End of repeated group ( N  times)
+    },
+
     # https://www.u-blox.com/en/docs/UBX-18010854#page=86&zoom=auto,-70,496
     "UBX-CFG-VALSET": { 
         "version": U1,
