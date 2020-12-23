@@ -49,17 +49,16 @@ class UBXMessage:
         return bytes((check_a, check_b))
 
     @staticmethod
-    def get_classid_def(class_id: bytes) -> (str, dict):
+    def get_classid_name(class_id: bytes) -> str:
         """
-        Retrieves the definition (name/key and container) corresponding to
-        the provided classid.
+        Retrieves the name corresponding to the provided classid.
         :param class_id: the ubx message bytes of the Class and ID
-        returns: (name,dict), ("", None) if not found
+        :return: (name,dict), ("", None) if not found
         """
-        for mclass in UBX_CLASSID_SET:
-            for name in mclass:
-                if mclass[name] == class_id: return name, mclass
-        return "", None
+        for group in UBX_CLASSIDS.values():
+            for name, value in group.items():
+                if value == class_id: return name
+        return ""
 
     @staticmethod
     def parse_bytes(content: bytes) -> dict:
@@ -71,10 +70,10 @@ class UBXMessage:
         result = {}
         if type(content) != bytes: return result
         if content[0:2] != UBXMessage.SIGNATURE: return result
-        mdef = UBXMessage.get_classid_def(content[2:4])
-        if mdef[0] == "": return result  # unrecognized message definition
+        name = UBXMessage.get_classid_name(content[2:4])
+        if not name: return result  # unrecognized message definition
         index = 6  # start from the payload initial byte
-        for attribute, size in UBX_PAYLOADS[mdef[0]].items():
+        for attribute, size in UBX_PAYLOADS[name].items():
             if type(size) == int:
                 # simple type
                 result[attribute] = content[index: index + size]
