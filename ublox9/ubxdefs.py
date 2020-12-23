@@ -155,44 +155,9 @@ UBX_CLASSID_SET = [
 # Section 5.8, Configuration overview
 # extracted verbatim from https://www.u-blox.com/en/docs/UBX-18010854#page=180&zoom=auto,-74,522
 """
-The ones starting with * are already ported to this file
-
-CFG-BDS BeiDou system configuration
-CFG-GEOFENCE Geofencing configuration
-CFG-HW Hardware configuration
-CFG-I2C Configuration of the I2C interface
-CFG-I2CINPROT Input protocol configuration of the I2C interface
-CFG-I2COUTPROT Output protocol configuration of the I2C interface
-* CFG-INFMSG Information message configuration
-CFG-ITFM Jamming and interference monitor configuration
-CFG-LOGFILTER Data logger configuration
-CFG-MOT Motion detector configuration
-* CFG-MSGOUT Message output configuration
-* CFG-NAVHPG High precision navigation configuration
-* CFG-NAVSPG Standard precision navigation configuration
-* CFG-NMEA NMEA protocol configuration
-CFG-ODO Odometer and low-speed course over ground filter configuration
-CFG-QZSS QZSS system configuration
-* CFG-RATE Navigation and measurement rate configuration
-CFG-RINV Remote inventory
-CFG-RTCM RTCM protocol configuration
-CFG-SBAS SBAS configuration
-CFG-SIGNAL Satellite systems (GNSS) signal configuration
-CFG-SPI Configuration of the SPI interface
-CFG-SPIINPROT Input protocol configuration of the SPI interface
-CFG-SPIOUTPROT Output protocol configuration of the SPI interface
-* CFG-TMODE Time mode configuration
-* CFG-TP Timepulse configuration
-CFG-TXREADY TX ready configuration
-* CFG-UART1 Configuration of the UART1 interface
-* CFG-UART1INPROT Input protocol configuration of the UART1 interface
-* CFG-UART1OUTPROT Output protocol configuration of the UART1 interface
-* CFG-UART2 Configuration of the UART2 interface
-* CFG-UART2INPROT Input protocol configuration of the UART2 interface
-* CFG-UART2OUTPROT Output protocol configuration of the UART2 interface
-* CFG-USB Configuration of the USB interface
-* CFG-USBINPROT Input protocol configuration of the USB interface
-* CFG-USBOUTPROT Output protocol configuration of the USB interface
+These are the configuration key-pairs for the u-blox generation 9 modules.
+As of 20201223 not all the keys are ported here yet. See the final CFG_SET
+to know exactly which are or aren't.
 """
 
 # CFG-INFMSG: Information message configuration
@@ -210,7 +175,7 @@ CFG_INFMSG = {
     "CFG-INFMSG-NMEA_USB": 0x20920009.to_bytes(4, "little", signed=False),  # X1 - - Information message enable flags for the NMEA protocol on the USB interface. See  Table 11  below for a list of possible constants for this item.
     "CFG-INFMSG-NMEA_SPI": 0x2092000a.to_bytes(4, "little", signed=False),  # X1 - - Information message enable flags for the NMEA protocol on the SPI interface.  See  Table 11  below for a list of possible constants for this item.
 }
-CFG_INFMSG_LEVEL = {  # Table 11
+TBL11_CFG_INFMSG = {  # Table 11
     "DISABLED": b"\x00",  # Disable any message
     "ERROR": b"\x01",  # Enable ERROR information messages
     "WARNING": b"\x02",  # Enable WARNING information messages
@@ -611,7 +576,7 @@ CFG_MSGOUT = {
 CFG_NAVHPG = {
     "CFG-NAVHPG-DGNSSMODE", 0x20140011.to_bytes(4, "little", signed=False),  # E1 - - Differential corrections mode. See Table 18 below for a list of possible constants for this item.
 }
-CFG_NAVHPG_DGNSSMODE = {  # Table 18
+TBL18_CFG_NAVHPG = {  # Table 18
     "RTK_FLOAT": b"\x02",  # No attempts made to fix ambiguities
     "RTK_FIXED": b"\x03",  # Ambiguities are fixed whenever possible
 }
@@ -651,19 +616,19 @@ CFG_NAVSPG = {
     "CFG-NAVSPG-CONSTR_ALTVAR": 0x401100c2.to_bytes(4, "little", signed=False),  # U4 0.0001 m^2 Fixed altitude variance for 2D mode.
     "CFG-NAVSPG-CONSTR_DGNSSTO": 0x201100c4.to_bytes(4, "little", signed=False),  # U1 - s DGNSS timeout
 }
-CFG_NAVSPG_FIXMODE = {  #Table 20
+TBL20_CFG_NAVSPG = {  #Table 20
     "2DONLY": b"\x01",  # 2D only
     "3DONLY": b"\x02",  # 3D only
     "AUTO": b"\x03",  # Auto 2D/3D
 }
-CFG_NAVSPG_UTCSTANDARD = {  #Table 21
+TBL21_CFG_NAVSPG = {  #Table 21
     "AUTO": b"\x00",  # Automatic; receiver selects based on GNSS configuration
     "USNO": b"\x03",  # UTC as operated by the U.S. Naval Observatory (USNO); derived from GPS time
     "EU": b"\x05",  # UTC as combined from multiple European laboratories; derived from Galileo time
     "SU": b"\x06",  # UTC as operated by the former Soviet Union (SU); derived from GLONASS time
     "NTSC": b"\x07",  # UTC as operated by the National Time Service Center (NTSC), China; derived from BeiDou time
 }
-CFG_NAVSPG_DYNMODEL = {  # Table 22
+TBL22_CFG_NAVSPG = {  # Table 22
     "PORT": b"\x00",  # Portable
     "STAT": b"\x02",  # Stationary
     "PED": b"\x03",  # Pedestrian
@@ -702,24 +667,24 @@ CFG_NMEA = {
     "CFG-NMEA-GSVTALKERID": 0x20930032.to_bytes(4, "little", signed=False),  # E1 - - Talker ID for GSV NMEA messages. By default the Talker ID for GSV messages is GNSS-specific (as defined by NMEA). This field enables the GSV Talker ID to be overridden. See Table 28 below for a list of possible constants for this item.
     "CFG-NMEA-BDSTALKERID": 0x30930033.to_bytes(4, "little", signed=False),  # U2 - - BeiDou Talker ID. Sets the two ASCII characters that should be used for the BeiDou Talker ID. If these are set to zero, the default BeiDou Talker ID will be used.
 }
-CFG_NMEA_PROTVER = {  # Table 24
+TBL24_CFG_NMEA = {  # Table 24
     "V21": int(21).to_bytes(1, "little"),  # NMEA protocol version 2.1
     "V23": int(23).to_bytes(1, "little"),  # NMEA protocol version 2.3
     "V40": int(40).to_bytes(1, "little"),  # NMEA protocol version 4.0 (not available in all products)
     "V41": int(41).to_bytes(1, "little"),  # NMEA protocol version 4.10 (not available in all products)
     "V411": int(42).to_bytes(1, "little"),  # NMEA protocol version 4.11 (not available in all products)
 }
-CFG_NMEA_MAXSVS = {  # Table 25
+TBL25_CFG_NMEA = {  # Table 25
     "UNLIM": int(0).to_bytes(1, "little"),  # Unlimited
     "8SVS": int(8).to_bytes(1, "little"),  # 8 SVs
     "12SVS": int(12).to_bytes(1, "little"),  # 12 SVs
     "16SVS": int(16).to_bytes(1, "little"),  # 16 SVs
 }
-CFG_NMEA_SVNUMBERING = {  # Table 26
+TBL26_CFG_NMEA = {  # Table 26
     "STRICT": b"\x00",  # Strict - satellites are not output
     "EXTENDED": b"\x01",  # Extended - use proprietary numbering
 }
-CFG_NMEA_MAINTALKERID = {  # Table 27
+TBL27_CFG_NMEA = {  # Table 27
     "AUTO": b"\x00",  # Main Talker ID is not overridden
     "GP": b"\x01",  # Set main Talker ID to 'GP'
     "GL": b"\x02",  # Set main Talker ID to 'GL'
@@ -728,7 +693,7 @@ CFG_NMEA_MAINTALKERID = {  # Table 27
     "GB": b"\x05",  # Set main Talker ID to 'GB' (not available in all products)
     "GQ": b"\x07",  # Set main Talker ID to 'GQ' (not available in all products)
 }
-CFG_NMEA_GSVTALKERID = {  # Table 28
+TBL28_CFG_NMEA = {  # Table 28
     "GNSS": b"\x00",  # Use GNSS-specific Talker ID (as defined by NMEA)
     "MAIN": b"\x01",  # Use the main Talker ID
 }
@@ -741,7 +706,7 @@ CFG_RATE = {
     "CFG-RATE-NAV": 0x30210002.to_bytes(4, "little", signed=False),  # U2 - - Ratio of number of measurements to number of navigation solutions. E.g. 5 means five measurements for every navigation solution. The maximum value is 128.
     "CFG-RATE-TIMEREF": 0x20210003.to_bytes(4, "little", signed=False),  # E1 - - Time system to which measurements are aligned. See Table 33 below for a list of possible constants for this item.
 }
-CFG_RATE_TIMEREF = {  # Table 33
+TBL33_CFG_RATE = {  # Table 33
     "UTC ": b"\x00",  # Align measurements to UTC time
     "GPS ": b"\x01",  # Align measurements to GPS time
     "GLO ": b"\x02",  # Align measurements to GLONASS time
@@ -771,12 +736,12 @@ CFG_TMODE = {
     "CFG-TMODE-SVIN_MIN_DUR": 0x40030010.to_bytes(4, "little", signed=False),  # U4 - s Survey-in minimum duration. This will only be used if CFG-TMODE-MODE=SURVEY_IN.
     "CFG-TMODE-SVIN_ACC_LIMIT": 0x40030011.to_bytes(4, "little", signed=False),  # U4 0.1 mm Survey-in position accuracy limit. This will only be used if CFG-TMODE-MODE=SURVEY_IN.
 }
-CFG_TMODE_MODE = { # Table 44
+TBL44_CFG_TMODE = { # Table 44
     "DISABLED": b"\x00",  # Disabled
     "SURVEY_IN": b"\x01",  # Survey in
     "FIXED": b"\x02",  # Fixed mode (true ARP position information required)
 }
-CFG_TMODE_POS_TYPE = {  # Table 45
+TBL45_CFG_TMODE = {  # Table 45
     "ECEF": b"\x00",  # Position is ECEF
     "LLH": b"\x01",  # Position is Lat/Lon/Height
 }
@@ -804,15 +769,15 @@ CFG_TP = {
     "CFG-TP-POL_TP1": 0x1005000b.to_bytes(4, "little", signed=False),  # L - - Set time pulse polarity (TP1). false (0) : falling edge at top of second. true (1) : rising edge at top of second.
     "CFG-TP-TIMEGRID_TP1": 0x2005000c.to_bytes(4, "little", signed=False),  # E1 - - Time grid to use (TP1). Only relevant if CFG-TP-USE_LOCKED_TP1 and ALIGN_TO_TOW_TP1 are set. Note that configured GNSS time is estimated by the receiver if locked to any GNSS system. If the receiver has a valid GNSS fix it will attempt to steer the TP to the specified time grid even if the specified time is not based on information from the constellation's satellites. To ensure timing based purely on a given GNSS, restrict the supported constellations in CFG-SIGNAL-*.
 }
-CFG_TP_PULSE_DEF = {  # Table 47
+TBL47_CFG_TP = {  # Table 47
     "PERIOD": b"\x00",  # Time pulse period [us]
     "FREQ": b"\x01",  # Time pulse frequency [Hz]
 }
-CFG_TP_PULSE_LENGTH_DEF = {  # Table 48
+TBL48_CFG_TP = {  # Table 48
     "RATIO": b"\x00",  # Time pulse ratio
     "LENGTH": b"\x01",  # Time pulse length
 }
-CFG_TP_TIMEGRID_TP1 = {  # Table 49
+TBL49_CFG_TP = {  # Table 49
     "UTC": b"\x00",  # UTC time reference
     "GPS": b"\x01",  # GPS time reference
     "GLO": b"\x02",  # GLONASS time reference
@@ -830,17 +795,17 @@ CFG_UART1 = {
     "CFG-UART1-PARITY": 0x20520004.to_bytes(4, "little", signed=False),  # E1 - - Parity mode that should be used on UART1 See  Table 55  below for a list of possible constants for this item. 
     "CFG-UART1-ENABLED": 0x10520005.to_bytes(4, "little", signed=False),  # L - - Flag to indicate if the UART1 should be enabled
 }
-CFG_UART1_STOPBITS = {  # Table 53, Table 59
+TBL53_CFG_UART1 = {  # Table 53
     "HALF": b"\x00",  # 0.5 stopbits
     "ONE": b"\x01",  # 1.0 stopbits
     "ONEHALF": b"\x02",  # 1.5 stopbits
     "TWO": b"\x03",  # 2.0 stopbits
 }
-CFG_UART1_DATABITS = {  # Table 54, Table 60
+TBL54_CFG_UART1 = {  # Table 54
     "EIGHT": b"\x00",  # 8 databits
     "SEVEN": b"\x01",  # 7 databits
 }
-CFG_UART1_PARITY = {  # Table 55, Table 61
+TBL55_CFG_UART1 = {  # Table 55
     "NONE": b"\x00",  # No parity bit
     "ODD": b"\x01",  # Add an odd parity bit
     "EVEN": b"\x02",  # Add an even parity bit
@@ -875,7 +840,10 @@ CFG_UART2 = {
     "CFG-UART2-ENABLED": 0x10530005.to_bytes(4, "little", signed=False),  # L - - Flag to indicate if the UART2 should be enabled
     "CFG-UART2-REMAP": 0x10530006.to_bytes(4, "little", signed=False),  # L - - UART2 Remapping
 }
-# contants tables are defined at CFG_UART1
+TBL59_CFG_UART2 = TBL53_CFG_UART1
+TBL60_CFG_UART2 = TBL54_CFG_UART1
+TBL61_CFG_UART2 = TBL55_CFG_UART1
+
 
 # CFG-UART2INPROT: Input protocol configuration of the UART2 interface
 # Input protocol enable flags of the UART2 interface.
@@ -934,4 +902,46 @@ CFG_USBOUTPROT = {
     "CFG-USBOUTPROT-UBX": 0x10780001.to_bytes(4, "little", signed=False),  # L - - Flag to indicate if UBX should be an output protocol on USB
     "CFG-USBOUTPROT-NMEA": 0x10780002.to_bytes(4, "little", signed=False),  # L - - Flag to indicate if NMEA should be an output protocol on USB
     "CFG-USBOUTPROT-RTCM3X": 0x10780004.to_bytes(4, "little", signed=False),  # L - - Flag to indicate if RTCM3X should be an output protocol on USB
+}
+
+# All the config keys put together
+# The commented out are not yet ported into this file
+CFG_KEYPAIRS = {
+    # GROUP-NAME : {KEYS}
+    # "CFG-BDS": CFG_BDS,  # BeiDou system configuration
+    # "CFG-GEOFENCE": CFG_GEOFENCE,  # Geofencing configuration
+    # "CFG-HW": CFG_HW,  # Hardware configuration
+    # "CFG-I2C": CFG_I2C,  # Configuration of the I2C interface
+    # "CFG-I2CINPROT": CFG_I2CINPROT,  # Input protocol configuration of the I2C interface
+    # "CFG-I2COUTPROT": CFG_I2COUTPROT,  # Output protocol configuration of the I2C interface
+    "CFG-INFMSG": CFG_INFMSG,  # Information message configuration
+    # "CFG-ITFM": CFG_ITFM,  # Jamming and interference monitor configuration
+    # "CFG-LOGFILTER": CFG_LOGFILTER,  # Data logger configuration
+    # "CFG-MOT": CFG_MOT,  # Motion detector configuration
+    "CFG-MSGOUT": CFG_MSGOUT,  # Message output configuration
+    "CFG-NAVHPG": CFG_NAVHPG,  # High precision navigation configuration
+    "CFG-NAVSPG": CFG_NAVSPG,  # Standard precision navigation configuration
+    "CFG-NMEA": CFG_NMEA,  # NMEA protocol configuration
+    # "CFG-ODO": CFG_ODO,  # Odometer and low-speed course over ground filter configuration
+    # "CFG-QZSS": CFG_QZSS,  # QZSS system configuration
+    "CFG-RATE": CFG_RATE,  # Navigation and measurement rate configuration
+    # "CFG-RINV": CFG_RINV,  # Remote inventory
+    # "CFG-RTCM": CFG_RTCM,  # RTCM protocol configuration
+    # "CFG-SBAS": CFG_SBAS,  # SBAS configuration
+    # "CFG-SIGNAL": CFG_SIGNAL,  # Satellite systems (GNSS) signal configuration
+    # "CFG-SPI": CFG_SPI,  # Configuration of the SPI interface
+    # "CFG-SPIINPROT": CFG_SPIINPROT,  # Input protocol configuration of the SPI interface
+    # "CFG-SPIOUTPROT": CFG_SPIOUTPROT,  # Output protocol configuration of the SPI interface
+    "CFG-TMODE": CFG_TMODE,  # Time mode configuration
+    "CFG-TP": CFG_TP,  # Timepulse configuration
+    # "CFG-TXREADY": CFG_TXREADY,  # TX ready configuration
+    "CFG-UART1": CFG_UART1,  # Configuration of the UART1 interface
+    "CFG-UART1INPROT": CFG_UART1INPROT,  # Input protocol configuration of the UART1 interface
+    "CFG-UART1OUTPROT": CFG_UART1OUTPROT,  # Output protocol configuration of the UART1 interface
+    "CFG-UART2": CFG_UART2,  # Configuration of the UART2 interface
+    "CFG-UART2INPROT": CFG_UART2INPROT,  # Input protocol configuration of the UART2 interface
+    "CFG-UART2OUTPROT": CFG_UART2OUTPROT,  # Output protocol configuration of the UART2 interface
+    "CFG-USB": CFG_USB,  # Configuration of the USB interface
+    "CFG-USBINPROT": CFG_USBINPROT,  # Input protocol configuration of the USB interface
+    "CFG-USBOUTPROT": CFG_USBOUTPROT  # Output protocol configuration of the USB interface
 }
