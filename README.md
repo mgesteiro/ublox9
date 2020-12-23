@@ -27,7 +27,7 @@ for message in ub9stream:
     print(message)
 ```
 
-You can parse **UBX messages** too:  *(beware: not all implemented yet ...)*
+You can parse **UBX messages** too:
 
 ```python
 # parse u-blox gen9 module UBX messages
@@ -37,6 +37,7 @@ from ublox9 import ublox9stream, ubxmessage
 message = ub9stream.read_ubxmessage()
 print( UBXMessage.parse_bytes(message) )
 ```
+*NOTE: not all payloads are implemented yet. Those not implemented will be treated generically.*
 
 
 ## INSTALL

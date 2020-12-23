@@ -4,7 +4,7 @@ UBXMessage class
 @author: mgesteiro
 """
 from ublox9.ubxdefs import *
-from ublox9.ubxpayloads import UBX_PAYLOADS
+from ublox9.ubxpayloads import UBX_PAYLOADS, UBX_GENERIC
 
 
 class UBXMessage:
@@ -72,8 +72,13 @@ class UBXMessage:
         if content[0:2] != UBXMessage.SIGNATURE: return result
         name = UBXMessage.get_classid_name(content[2:4])
         if not name: return result  # unrecognized message definition
+        result['message'] = name.encode()  # bytes format as the other fields
         index = 6  # start from the payload initial byte
-        for attribute, size in UBX_PAYLOADS[name].items():
+        try:
+            ubx_payload = UBX_PAYLOADS[name]
+        except KeyError:
+            ubx_payload = UBX_PAYLOADS[UBX_GENERIC]
+        for attribute, size in ubx_payload.items():
             if type(size) == int:
                 # simple type
                 result[attribute] = content[index: index + size]
