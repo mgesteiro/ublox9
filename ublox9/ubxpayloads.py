@@ -1,6 +1,22 @@
 """
 UBX payloads definitions (including generation 9)
+
+As of 20201223 only a few payloads are implemented (those that I needed).
+The format is pretty simple and extensible as it reflects almost verbatim
+the official document. It should be quite easy to implement any new payload.
 """
+# 1.5.2 GNSS identifiers
+# https://www.u-blox.com/en/docs/UBX-18010854#page=16&zoom=auto,-70,377
+GNSS_IDENTFIERS = {
+    "GPS": 0,  # GPS G 0 1 1 1
+    "SBAS": 1,  # SBAS S 1 1 1 1
+    "Galileo": 2,  # GAL E 2 n/a 3 3
+    "BeiDou": 3,  # BDS B 3 n/a (4) 1 4
+    "IMES": 4,  # IMES I 4 n/a n/a n/a
+    "QZSS": 5,  # QZSS Q 5 n/a (1) 1 5
+    "GLONASS": 6,  # GLO R 6 2 2 2
+}
+
 # 3.3.5 UBX data types
 # https://www.u-blox.com/en/docs/UBX-18010854#page=45&zoom=auto,-70,312
 # its value corresponds to its size in bytes
@@ -27,20 +43,9 @@ GROUPS_LENGTH = [
     "R",  # Rest of the payload
 ]
 
-# 1.5.2 GNSS identifiers
-# https://www.u-blox.com/en/docs/UBX-18010854#page=16&zoom=auto,-70,377
-GNSS_IDENTFIERS = {
-    "GPS": 0,  # GPS G 0 1 1 1
-    "SBAS": 1,  # SBAS S 1 1 1 1
-    "Galileo": 2,  # GAL E 2 n/a 3 3
-    "BeiDou": 3,  # BDS B 3 n/a (4) 1 4
-    "IMES": 4,  # IMES I 4 n/a n/a n/a
-    "QZSS": 5,  # QZSS Q 5 n/a (1) 1 5
-    "GLONASS": 6,  # GLO R 6 2 2 2
-}
-
-
+# All the implemented payloads with a link to each definition
 UBX_PAYLOADS = {
+
     # https://www.u-blox.com/en/docs/UBX-18010854#page=52&zoom=auto,-70,314
     "UBX-ACK-ACK": {
         "clsID": U1,  # 0 U1 - - Class ID of the Acknowledged Message
@@ -56,17 +61,24 @@ UBX_PAYLOADS = {
     # https://www.u-blox.com/en/docs/UBX-18010854#page=85&zoom=auto,-70,164
     "UBX-CFG-VALGET": {
         "version": U1,  # 0 U1 - - Message version (0x01 for this version)
-        "layer": U1,  # 1 U1 - - The  layer  from  which  the  configuration  item  was retrieved: • 0 - RAM layer • 1 - BBR • 2 - Flash • 7 - Default
+        "layer": U1,  # 1 U1 - - The layer from which the configuration item was retrieved: • 0 - RAM layer • 1 - BBR • 2 - Flash • 7 - Default
         "position": U2, # 2 U2 - - Number  of  configuration  items  skipped  in  the  result set  before  constructing  this  message  (mirrors  the equivalent field in the request message)
         "cfgData": ("R", U1) # 4 + n U1  - - Configuration data  (key and value pairs) End of repeated group ( N  times)
     },
 
     # https://www.u-blox.com/en/docs/UBX-18010854#page=86&zoom=auto,-70,496
     "UBX-CFG-VALSET": { 
-        "version": U1,
-        "layers": X1,
-        "reserved0": 2,  # U1[2]
-        "cfgData": ("R", U1)
+        "version": U1,  # 0 U1 - - Message version (0x00 for this version)
+        "layers": X1,  # 1 X1 - - The layers where the configuration should be applied: bit 0 U :1 ram - - Update configuration in the RAM layer bit 1 U :1 bbr - - Update configuration in the BBR layer bit 2 U :1 flash - - Update configuration in the Flash layer
+        "reserved0": 2,  # 2 U1[2] - - Reserved
+        "cfgData": ("R", U1)  # 4 + n U1 - - Configuration data  (key and value pairs)
+    },
+
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=125&zoom=auto,-70,616
+    "UBX-MON-VER": {
+        "swVersion": 30,  # 0 CH[30] - - Nul-terminated software version string.
+        "hwVersion": 10,  # 30 CH[10] - - Nul-terminated hardware version string
+        "extension": ("N", 30),  # 40 + n·30 CH[30] - - Extended software information strings. A series of nul-terminated strings. Each extension field is 30 characters long and contains varying software information. Not all extension fields may appear. Examples of reported information: the software version string of the underlying ROM (when the receiver's firmware is running from flash), the firmware version, the supported protocol version, the module identifier, the flash information structure (FIS) file information, the supported major GNSS, the supported augmentation systems. See Firmware and protocol versions for details.
     },
 
     # https://www.u-blox.com/en/docs/UBX-18010854#page=132&zoom=auto,-70,545
@@ -131,13 +143,6 @@ UBX_PAYLOADS = {
         "version": U1,  # 0 U1 - - Message version (0x01 for this version)
         "reserved0": 3,  # 1 U1[3] - - Reserved
         "uniqueId": 5,  # 4 U1[5] - - Unique chip ID
-    },
-
-    # https://www.u-blox.com/en/docs/UBX-18010854#page=125&zoom=auto,-70,616
-    "UBX-MON-VER": {
-        "swVersion": 30,  # 0 CH[30] - - Nul-terminated software version string.
-        "hwVersion": 10,  # 30 CH[10] - - Nul-terminated hardware version string
-        "extension": ("N", 30),  # 40 + n·30 CH[30] - - Extended software information strings. A series of nul-terminated strings. Each extension field is 30 characters long and contains varying software information. Not all extension fields may appear. Examples of reported information: the software version string of the underlying ROM (when the receiver's firmware is running from flash), the firmware version, the supported protocol version, the module identifier, the flash information structure (FIS) file information, the supported major GNSS, the supported augmentation systems. See Firmware and protocol versions for details.
     },
 
 }
