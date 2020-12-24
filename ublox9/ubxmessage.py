@@ -78,19 +78,35 @@ class UBXMessage:
             ubx_payload = UBX_PAYLOADS[name]
         except KeyError:
             ubx_payload = UBX_PAYLOADS[UBX_GENERIC]
-        for attribute, size in ubx_payload.items():
-            if type(size) == int:
+        for attribute, specs in ubx_payload.items():
+            if type(specs) == int:
                 # simple type
+                size = specs
                 result[attribute] = content[index: index + size]
                 index += size
-            elif type(size) == tuple:
-                # groups
-                if size[0] == "N":
-                    # fixed width fields of size[1] size
-                    for i in range(int((len(content)-2-index)/size[1])):
-                        result[attribute+f"{i}"] = content[index: index + size[1]]
-                        index += size[1]
-                elif size[0] == "R":
+            elif type(specs) == tuple:
+                # repeating groups
+
+                if specs[0] == "PN":
+                    # predetermined number of groups
+                    numfield, subattribes = specs[1]
+                    numofg = int.from_bytes(result[numfield], byteorder="little", signed=False)
+                    for i in range(numofg):
+                        group = {}
+                        for subattrib, size in subattribes.items():
+                            group[subattrib] = content[index: index + size]
+                            index += size
+                        result[attribute+f"{i}"] = group
+
+                elif specs[0] == "FL":
+                    # fixed length groups, as many as possible fit in the payload
+                    size = specs[1]
+                    for i in range(int((len(content)-2-index)/size)):
+                        result[attribute+f"{i}"] = content[index: index + size]
+                        index += size
+
+                elif specs[0] == "RP":
                     # rest of the payload
                     result[attribute] = content[index: len(content)-2]
+
         return result

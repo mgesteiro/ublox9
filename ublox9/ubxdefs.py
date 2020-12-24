@@ -1,3 +1,7 @@
+# Some generic definitions
+UBX_DISABLED = b"\x00"  # False
+UBX_ENABLED = b"\x01"  # True
+
 # Section 3.8, UBX messages overview
 # extracted verbatim from https://www.u-blox.com/en/docs/UBX-18010854#page=49&zoom=auto,-74,575
 

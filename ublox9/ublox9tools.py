@@ -10,9 +10,8 @@ Created on 9 Dec 2020
 """
 import socket
 import time
-from ublox9 import Ublox9Stream, UBXMessage
+from ublox9 import Ublox9Stream, UBXMessage, UBX_CFG, UBX_ACK
 from ublox9.ublox9defs import MSG_NMEA, MSG_UBX, MSG_RTCM
-from ublox9.ubxdefs import UBX_CFG
 from serial import Serial, SerialException, SerialTimeoutException
 
 
@@ -64,6 +63,12 @@ def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
                 time.sleep(0.250)
         except (SerialException, SerialTimeoutException, ValueError):
             pass
+
+
+UBX_ACK_VALSET = UBXMessage(
+    UBX_ACK["UBX-ACK-ACK"],
+    UBX_CFG["UBX-CFG-VALSET"]
+).message_bytes()
 
 
 def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:

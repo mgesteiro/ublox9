@@ -39,8 +39,9 @@ CH = 1  # ASCII / ISO 8859-1 char (8-bit) n/a n/a
 # 3.3.7 UBX repeated fields
 # https://www.u-blox.com/en/docs/UBX-18010854#page=46&zoom=auto,-70,468
 GROUPS_LENGTH = [
-    "N",  # N fixed length groups
-    "R",  # Rest of the payload
+    "PN",  # predetermined number of groups
+    "FL",  # fixed length groups, as many as possible fit in the payload
+    "RP",  # Rest of the payload
 ]
 
 # All the implemented payloads with a link to each definition
@@ -64,7 +65,7 @@ UBX_PAYLOADS = {
         "version": U1,  # 0 U1 - - Message version (0x01 for this version)
         "layer": U1,  # 1 U1 - - The layer from which the configuration item was retrieved: • 0 - RAM layer • 1 - BBR • 2 - Flash • 7 - Default
         "position": U2, # 2 U2 - - Number  of  configuration  items  skipped  in  the  result set  before  constructing  this  message  (mirrors  the equivalent field in the request message)
-        "cfgData": ("R", U1) # 4 + n U1  - - Configuration data  (key and value pairs) End of repeated group ( N  times)
+        "cfgData": ("RP", U1) # 4 + n U1  - - Configuration data  (key and value pairs) End of repeated group ( N  times)
     },
 
     # https://www.u-blox.com/en/docs/UBX-18010854#page=86&zoom=auto,-70,496
@@ -72,14 +73,14 @@ UBX_PAYLOADS = {
         "version": U1,  # 0 U1 - - Message version (0x00 for this version)
         "layers": X1,  # 1 X1 - - The layers where the configuration should be applied: bit 0 U :1 ram - - Update configuration in the RAM layer bit 1 U :1 bbr - - Update configuration in the BBR layer bit 2 U :1 flash - - Update configuration in the Flash layer
         "reserved0": 2,  # 2 U1[2] - - Reserved
-        "cfgData": ("R", U1)  # 4 + n U1 - - Configuration data  (key and value pairs)
+        "cfgData": ("RP", U1)  # 4 + n U1 - - Configuration data  (key and value pairs)
     },
 
     # https://www.u-blox.com/en/docs/UBX-18010854#page=125&zoom=auto,-70,616
     "UBX-MON-VER": {
         "swVersion": 30,  # 0 CH[30] - - Nul-terminated software version string.
         "hwVersion": 10,  # 30 CH[10] - - Nul-terminated hardware version string
-        "extension": ("N", 30),  # 40 + n·30 CH[30] - - Extended software information strings. A series of nul-terminated strings. Each extension field is 30 characters long and contains varying software information. Not all extension fields may appear. Examples of reported information: the software version string of the underlying ROM (when the receiver's firmware is running from flash), the firmware version, the supported protocol version, the module identifier, the flash information structure (FIS) file information, the supported major GNSS, the supported augmentation systems. See Firmware and protocol versions for details.
+        "extension": ("FL", 30),  # 40 + n·30 CH[30] - - Extended software information strings. A series of nul-terminated strings. Each extension field is 30 characters long and contains varying software information. Not all extension fields may appear. Examples of reported information: the software version string of the underlying ROM (when the receiver's firmware is running from flash), the firmware version, the supported protocol version, the module identifier, the flash information structure (FIS) file information, the supported major GNSS, the supported augmentation systems. See Firmware and protocol versions for details.
     },
 
     # https://www.u-blox.com/en/docs/UBX-18010854#page=132&zoom=auto,-70,545
@@ -119,6 +120,31 @@ UBX_PAYLOADS = {
         "magAcc": U2,  # 90 1e-2 deg Magnetic declination accuracy. Only supported in ADR 4.10 and later.
     },
 
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=138&zoom=auto,-70,226
+    # Type: Periodic/polled
+    # Comment: This message displays information about signals currently tracked by the receiver.
+    # On the F9 platform the maximum number of signals is 120.
+    "UBX-NAV-SIG": {
+        "iTOW": U4,  # 0 U4 - ms GPS time of week of the navigation epoch. See the section iTOW timestamps in Integration manual for details.
+        "version": U1,  # 4 U1 version - - Message version (0x00 for this version)
+        "numSigs": U1,  # 5 U1 - - Number of signals
+        "reserved0": 2,  # 6 U1[2] - - Reserved
+        # repeated group (numSigs times)
+        "group": ("PN", ("numSigs", {
+            "gnssId": U1,  # 8 + n·16 U1 - - GNSS identifier (see Satellite Numbering) for assignment
+            "svId": U1,  # 9 + n·16 U1 - - Satellite identifier (see Satellite Numbering) for assignment
+            "sigId": U1,  # 10 + n·16 U1 - - New style signal identifier (see Signal Identifiers)
+            "freqId": U1,  # 11 + n·16 U1 - - Only used for GLONASS: This is the frequency slot + 7 (range from 0 to 13)
+            "prRes": I2,  # 12 + n·16 I2 0.1 m Pseudorange residual
+            "cno": U1,  # 14 + n·16 U1 - dBHz Carrier-to-noise density ratio (signal strength)
+            "qualityInd": U1,  # 15 + n·16 U1 - - Signal quality indicator: • 0 = no signal • 1 = searching signal • 2 = signal acquired • 3 = signal detected but unusable • 4 = code locked and time synchronized • 5, 6, 7 = code and carrier locked and time synchronized
+            "corrSource": U1,  # 16 + n·16 U1 - - Correction source: • 0 = no corrections • 1 = SBAS corrections • 2 = BeiDou corrections • 3 = RTCM2 corrections • 4 = RTCM3 OSR corrections • 5 = RTCM3 SSR corrections • 6 = QZSS SLAS corrections
+            "ionoModel": U1,  # 17 + n·16 U1 - - Ionospheric model used: • 0 = no model • 1 = Klobuchar model transmitted by GPS • 2 = SBAS model • 3 = Klobuchar model transmitted by BeiDou • 8 = Iono delay derived from dual frequency observations
+            "sigFlags": X2,  # 18 + n·16 X2 - - Signal related flags bits 1...0 U :2 health - - Signal health flag: • 0 = unknown • 1 = healthy • 2 = unhealthy bit 2 U :1 prSmoothed - - 1 = Pseudorange has been smoothed bit 3 U :1 prUsed - - 1 = Pseudorange has been used for this signal bit 4 U :1 crUsed - - 1 = Carrier range has been used for this signal bit 5 U :1 doUsed - - 1 = Range rate (Doppler) has been used for this signal bit 6 U :1 prCorrUsed - - 1 = Pseudorange corrections have been used for this signal bit 7 U :1 crCorrUsed - - 1 = Carrier range corrections have been used for this signal bit 8 U :1 doCorrUsed - - 1 = Range rate (Doppler) corrections have been used for this signal
+            "reserved1": 4  # 20 + n·16 U1[4] - - Reserved
+        }))
+    },
+
     # https://www.u-blox.com/en/docs/UBX-18010854#page=141&zoom=auto,-70,719
     "UBX-NAV-SVIN": {
         "version ": U1,  # 0 - - - Message version (0x00 for this version)
@@ -148,6 +174,6 @@ UBX_PAYLOADS = {
 
     # generic payload
     UBX_GENERIC: {
-        "payload": ("R", 1)  # just the payload
+        "payload": ("RP", 1)  # just the payload
     }
 }
