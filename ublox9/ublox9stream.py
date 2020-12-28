@@ -16,6 +16,7 @@ class Ublox9Stream:
     def __init__(self, stream):
         """
         Constructor.
+
         :params stream: stream with read()/readline()/write() methods
         """
         self._stream = stream
@@ -61,12 +62,13 @@ class Ublox9Stream:
         Reads data from the stream and returns the next available message.
         This method assumes that every message is complete and atomic (i.e. no
         interleaving supported).
-        :param maxsearchbytes: max number of non-expected bytes to ignore/skip
-        :return: the message read. Empty if EOF or any other problem
+
+        :param maxsearchbytes: max number of non-expected bytes to ignore/skip. 128 by default.
+        :return: the message read. Empty if EOF or any other problem.
         """
         rembytes = maxsearchbytes  # remaining bytes to read
         read_byte = self._stream.read(1)  # first byte
-        while (rembytes > 0) and (read_byte):
+        while (rembytes > 0) and read_byte:
 
             if read_byte == b"$":
                 # possible NMEA message
@@ -111,18 +113,20 @@ class Ublox9Stream:
         # if we reach here, no valid message was found
         return b""
 
-    def read_ubxmessage(self, discardlimit=12, maxsearchbytes=128) -> bytes:
+    def read_ubxmessage(self, discardlimit=16, maxsearchbytes=128) -> bytes:
         """
         Gets the next UBX message from the stream, discarding all previous non
-        UBX messages up to the provided limit.
-        :param discardlimit: max non-ubx messages to discard before returning.
-            12 by default, use 0 to remove this limit.
+        UBX messages up to the provided limit. This method invoques internally
+        the read_message() method and discards the non-UBX messages.
+
+        :param discardlimit: max non-UBX messages to discard before returning.
+            16 by default, use 0 to remove this limit.
         :param maxsearchbytes: as needed by read_message(). 128 by default.
-        :return: the following UBX message or empty if the limit is reached or
+        :return: the following UBX message or empty if any limit is reached or
             there are no more messages available.
         """
         discarded = 0
-        message = self.read_message()
+        message = self.read_message(maxsearchbytes=maxsearchbytes)
         while message and (message[0:1] != b"\xb5"):
             discarded += 1
             if (discardlimit > 0) & (discarded >= discardlimit):
@@ -133,15 +137,20 @@ class Ublox9Stream:
     def write_message(self, message: bytes):
         """
         Writes the bytes directly to the stream. No checks performed.
+
         :param message: the bytes to be sent
         """
         self._stream.write(message)
 
     def close(self):
-        """Closes the underlying stream. No checks."""
+        """
+        Closes the underlying stream. No checks.
+        """
         self._stream.close()
 
     def clear_input(self):
-        """Empties input buffer by reading all of it"""
+        """
+        Empties input buffer by reading all of it
+        """
         while self._stream.read(256):
             pass

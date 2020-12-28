@@ -1,10 +1,22 @@
+# some generic functions
+def to_u1(key: int) -> bytes:
+    """wrapper to express an int in u-blox bytes format U1"""
+    return key.to_bytes(1, "little", signed=False)
+
+
+def to_u4(key: int) -> bytes:
+    """wrapper to express an int in u-blox bytes format U4"""
+    return key.to_bytes(4, "little", signed=False)
+
+
 # Some generic definitions
 UBX_DISABLED = b"\x00"  # False
 UBX_ENABLED = b"\x01"  # True
 
-# Section 3.8, UBX messages overview
-# extracted verbatim from https://www.u-blox.com/en/docs/UBX-18010854#page=49&zoom=auto,-74,575
-
+"""
+Section 3.8, UBX messages overview
+extracted verbatim from https://www.u-blox.com/en/docs/UBX-18010854#page=49&zoom=auto,-74,575
+"""
 # UBX-ACK – Acknowledgement and negative acknowledgement messages
 UBX_ACK = {
     "UBX-ACK-ACK": b"\x05\x01",  # Message acknowledged (Output)
@@ -167,20 +179,14 @@ UBX_CLASSIDS = {
     "UBX-UPD": UBX_UPD  # Firmware update messages
 }
 
-# Section 5.8, Configuration overview
-# extracted verbatim from https://www.u-blox.com/en/docs/UBX-18010854#page=180&zoom=auto,-74,522
 """
+Section 5.8, Configuration overview
+extracted verbatim from https://www.u-blox.com/en/docs/UBX-18010854#page=180&zoom=auto,-74,522
+
 These are the configuration key-pairs for the u-blox generation 9 modules.
 As of 20201223 not all the keys are ported here yet. See the final CFG_KEYPAIRS
 to know exactly which are or aren't.
 """
-
-
-def to_u4(key: int) -> bytes:
-    """wrapper to express an int in u-blox bytes format"""
-    return key.to_bytes(4, "little", signed=False)
-
-
 # CFG-INFMSG: Information message configuration
 # Information message configuration for the NMEA and UBX protocols.
 # https://www.u-blox.com/en/docs/UBX-18010854#page=184&zoom=auto,-70,539
