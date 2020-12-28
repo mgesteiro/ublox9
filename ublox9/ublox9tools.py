@@ -16,24 +16,52 @@ from serial import Serial, SerialException, SerialTimeoutException
 
 
 class StreamToTCP:
-    """docstring for StreamToTCP"""
+    """
+    Simple stream wrapper of a TCP connection
+    """
 
-    def __init__(self, address, timeout=1):
+    def __init__(self, address, timeout: float = 1.0):
+        """
+        Constructor.
+
+        :param address: TCP/IP address to connect to
+        :param timeout: timeout in seconds. 1 by default.
+        """
         # super(StreamToSocket, self).__init__()
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.settimeout(timeout)
         self._socket.connect(address)
 
-    def read(self, amount=1) -> bytes:
+    def read(self, amount: int = 1) -> bytes:
+        """
+        read from the stream the specified amount of bytes
+
+        :param amount: amount of bytes to read. 1 by default.
+        :return: bytes read
+        """
         return self._socket.recv(amount)
 
     def write(self, data: bytes):
-        return self._socket.send(data)
+        """
+        write to the stream
+
+        :param data: bytes to write to the stream
+        """
+        self._socket.send(data)
 
     def readline(self, amount=0) -> bytes:
+        """
+        read a line from the stream.
+
+        :param amount: max amount of bytes to read
+        :return: bytes read
+        """
         return self._socket.recv(amount)
 
     def close(self):
+        """
+        close the stream
+        """
         self._socket.close()
 
 
@@ -43,19 +71,20 @@ def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
     a valid communication with the ublox module (sending UBX-SEC-UNIQID message)
     if a valid connection is achieved, the id property of the resulting object
     is populated with the u-blox module UNIQID.
+
     :param serialport: the device port to open
     :param baudrates: a list of baudrates to try
     :param timeout: timeout in seconds
     :return: an Ublox9Stream if successfull, None otherwise
     """
-    unique = b"\xB5\x62\x27\x03\x00\x00\x2A\xA5"
+    unique = b"\xb5\x62\x27\x03\x00\x00\x2a\xa5"
     for baudrate in baudrates:
         try:
             sport = Serial(serialport, baudrate, timeout=timeout)
             ub9stream = Ublox9Stream(sport)
             ub9stream.write_message(unique)
-            answ = ub9stream.read_ubxmessage(discardlimit=12, maxsearchbytes=90)
-            if answ:
+            answ = ub9stream.read_ubxmessage(discardlimit=30, maxsearchbytes=100)
+            if answ and (answ[:6] == b'\xb5\x62\x27\x03\x09\x00'):
                 ub9stream.id = answ[10:15]
                 return ub9stream
             else:
@@ -75,6 +104,7 @@ def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
     """
     creates an UBX-VALSET message with the specified values/keys of cfgData
     to be written to the specified layers
+
     :param layers: which layers should be written the config to
     :param cfg_data: the bundle of keys and values
     :return: the VALSET message ready to be sent
@@ -87,7 +117,8 @@ def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
 
 def get_message_type(message: bytes) -> int:
     """
-    Returns the type of the message
+    Returns the type of the message.
+
     :param message: the message to classify
     :return: the message type
     """
