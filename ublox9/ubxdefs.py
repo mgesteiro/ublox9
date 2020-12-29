@@ -601,7 +601,7 @@ CFG_MSGOUT = {
 # This group configures items related to the operation of the receiver in high precision, for example Differential correction and other related features.
 # https://www.u-blox.com/en/docs/UBX-18010854#page=201&zoom=auto,-70,370
 CFG_NAVHPG = {
-    "CFG-NAVHPG-DGNSSMODE", to_u4(0x20140011),  # E1 - - Differential corrections mode. See Table 18 below for a list of possible constants for this item.
+    "CFG-NAVHPG-DGNSSMODE": to_u4(0x20140011),  # E1 - - Differential corrections mode. See Table 18 below for a list of possible constants for this item.
 }
 TBL18_CFG_NAVHPG = {  # Table 18
     "RTK_FLOAT": b"\x02",  # No attempts made to fix ambiguities

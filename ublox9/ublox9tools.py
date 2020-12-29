@@ -115,6 +115,21 @@ def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
     return UBXMessage(UBX_CFG["UBX-CFG-VALSET"], payload).message_bytes()
 
 
+def gen_valget_message(layer: bytes, keys: bytes) -> bytes:
+    """
+    creates an UBX-VALGET message with the specified keys of cfgData
+    to be written to the specified layers
+
+    :param layer: which layer should be queried
+    :param keys: the bundle of keys to be queried
+    :return: the VALGET message ready to be sent
+    """
+    version = b"\x00"
+    position = b"\x00\x00"
+    payload = version + layer + position + keys
+    return UBXMessage(UBX_CFG["UBX-CFG-VALGET"], payload).message_bytes()
+
+
 def get_message_type(message: bytes) -> int:
     """
     Returns the type of the message.
