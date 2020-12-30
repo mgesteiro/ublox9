@@ -1,17 +1,19 @@
-# some generic functions
+"""
+UBX protocol and messages handling definitions and functions.
+"""
+UBX_DISABLED = b"\x00"  # False
+UBX_ENABLED = b"\x01"  # True
+
+
 def to_u1(key: int) -> bytes:
     """wrapper to express an int in u-blox bytes format U1"""
-    return key.to_bytes(1, "little", signed=False)
+    return key.to_bytes(1, byteorder="little", signed=False)
 
 
 def to_u4(key: int) -> bytes:
     """wrapper to express an int in u-blox bytes format U4"""
-    return key.to_bytes(4, "little", signed=False)
+    return key.to_bytes(4, byteorder="little", signed=False)
 
-
-# Some generic definitions
-UBX_DISABLED = b"\x00"  # False
-UBX_ENABLED = b"\x01"  # True
 
 """
 Section 3.8, UBX messages overview

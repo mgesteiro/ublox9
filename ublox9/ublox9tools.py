@@ -1,5 +1,5 @@
 """
-ublox9 tools
+u-blox generation 9 support utils and tools
 
 Based on the ZED-F9P u-blox GNSS receiver documentation:
 https://www.u-blox.com/en/docs/UBX-18010854
@@ -11,8 +11,12 @@ Created on 9 Dec 2020
 import socket
 import time
 from ublox9 import Ublox9Stream, UBXMessage, UBX_CFG, UBX_ACK
-from ublox9.ublox9defs import MSG_NMEA, MSG_UBX, MSG_RTCM
 from serial import Serial, SerialException, SerialTimeoutException
+
+UBX_ACK_VALSET = UBXMessage(
+    UBX_ACK["UBX-ACK-ACK"],
+    UBX_CFG["UBX-CFG-VALSET"]
+).message_bytes()
 
 
 class StreamToTCP:
@@ -94,16 +98,11 @@ def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
             pass
 
 
-UBX_ACK_VALSET = UBXMessage(
-    UBX_ACK["UBX-ACK-ACK"],
-    UBX_CFG["UBX-CFG-VALSET"]
-).message_bytes()
-
-
 def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
     """
-    creates an UBX-VALSET message with the specified values/keys of cfgData
-    to be written to the specified layers
+    creates an UBX-VALSET message with the specified values/keys (cfg_data)
+    to be written to the specified layer.
+    See https://www.u-blox.com/en/docs/UBX-18010854#page=86&zoom=auto,-70,496
 
     :param layers: which layers should be written the config to
     :param cfg_data: the bundle of keys and values
@@ -117,8 +116,9 @@ def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
 
 def gen_valget_message(layer: bytes, keys: bytes) -> bytes:
     """
-    creates an UBX-VALGET message with the specified keys of cfgData
-    to be written to the specified layers
+    creates an UBX-VALGET message with the specified keys to be queried from the
+    specified layer.
+    See https://www.u-blox.com/en/docs/UBX-18010854#page=84&zoom=auto,-70,112
 
     :param layer: which layer should be queried
     :param keys: the bundle of keys to be queried
@@ -140,4 +140,4 @@ def get_message_type(message: bytes) -> int:
     firstbye = message[0:1]
     if firstbye == b"$": return MSG_NMEA
     if firstbye == b"\xb5": return MSG_UBX
-    if firstbye == b"\xf5": return MSG_RTCM
+    if firstbye == b"\xd3": return MSG_RTCM3

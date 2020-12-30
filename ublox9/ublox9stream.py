@@ -91,20 +91,21 @@ class Ublox9Stream:
                 # payload (Length)
                 # CKACKB(2)
                 header = read_byte + self._stream.read(5)
-                plen = int.from_bytes(header[-2:], "little", signed=False)
+                plen = int.from_bytes(header[-2:], byteorder="little", signed=False)
                 rest = self._stream.read(plen + 2)
                 return header + rest
 
-            if read_byte == b"\xf5":
-                # possible RTCM message
+            if read_byte == b"\xd3":
+                # possible RTCM3 message
                 # https://www.u-blox.com/en/docs/UBX-18010854#page=161
-                # ID(1)
-                # preamble(1)
-                # bitfield0(2) (includes numData)
-                # data(numData)
-                # crc(3)
-                # return (MSG_RTCM, xxx)
-                pass  # not handled yet
+                # 0 U1 preamble 0xd3
+                # 1 X2 bitfield0: numData=10 bits(0..9), res1=6 bits (10..15) all 0
+                # 3 U1*numData data
+                # 3+numData U1[3] crc
+                header = read_byte + self._stream.read(2)
+                plen = int.from_bytes(header[-2:], byteorder="big", signed=False)
+                rest = self._stream.read(plen + 3)
+                return header + rest
 
             # unknown or unexpected byte: ignore it
             read_byte = self._stream.read(1)  # read next

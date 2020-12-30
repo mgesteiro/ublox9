@@ -12,11 +12,12 @@ class UBXMessage:
 
     SIGNATURE = b"\xb5\x62"
 
-    def __init__(self, class_id: bytes, payload: bytes =b""):
+    def __init__(self, class_id: bytes, payload: bytes = b""):
         """
         Constructor
         Creates an UBXMessage object with the provided data.
         Reference at https://www.u-blox.com/en/docs/UBX-18010854#page=44
+
         :param class_id: message Class and ID
         :param payload: content of the message
         """
@@ -27,6 +28,7 @@ class UBXMessage:
     def message_bytes(self) -> bytes:
         """
         Returns the binary representation of the message, ready to be sent.
+
         :return: the message bytes
         """
         base = self._class_id + self._plen + self._payload
@@ -36,6 +38,7 @@ class UBXMessage:
     def calc_checksum(content: bytes) -> bytes:
         """
         Calculates and returns the checksum bytes for the content.
+
         :param content: bytes:
         :return: the checksum
         """
@@ -52,6 +55,7 @@ class UBXMessage:
     def get_classid_name(class_id: bytes) -> str:
         """
         Retrieves the name corresponding to the provided classid.
+
         :param class_id: the ubx message bytes of the Class and ID
         :return: (name,dict), ("", None) if not found
         """
@@ -64,6 +68,7 @@ class UBXMessage:
     def parse_bytes(content: bytes) -> dict:
         """
         Parse the UBX message in content. Only simple validations.
+
         :param content: the complete message bytes
         :return: the parsed message in a dict, empty if fails/invalid
         """
@@ -73,6 +78,7 @@ class UBXMessage:
         name = UBXMessage.get_classid_name(content[2:4])
         if not name: return result  # unrecognized message definition
         result['message'] = name.encode()  # bytes format as the other fields
+        result['length'] = int.from_bytes(content[4:6], byteorder="little", signed=False)
         index = 6  # start from the payload initial byte
         try:
             ubx_payload = UBX_PAYLOADS[name]

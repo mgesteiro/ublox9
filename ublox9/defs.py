@@ -1,23 +1,20 @@
 """
-ublox9 globals and constants definitions
-
-Based on the ZED-F9P u-blox GNSS receiver documentation:
-https://www.u-blox.com/en/docs/UBX-18010854
-
-Created on 27 Nov 2020
-
-@author: mgesteiro
+ublox9 package basic definitions
 """
+# u-blox generation 9 messages types
 MSG_NMEA = 2
 MSG_UBX = 3
-MSG_RTCM = 4
+MSG_RTCM3 = 4
 
+# u-blox generation 9 VALGET possible layers: can't be combined
 VALGET_RAM = bytes([0b0000])  # 0
 VALGET_BBR = bytes([0b0001])  # 1
 VALGET_FLASH = bytes([0b0010])  # 2
 VALGET_DEFAULT = bytes([0b0111])  # 7
 
+# u-blox generation 9 VALSET possible layers values: can be combined with OR
 VALSET_RAM = bytes([0b0001])  # 1
 VALSET_BBR = bytes([0b0010])  # 2
 VALSET_FLASH = bytes([0b0100])  # 3
 VALSET_ALL = bytes([0b0111])  # 7
+
