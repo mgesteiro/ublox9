@@ -1,5 +1,5 @@
 """
-RTCM3Message class
+RTCM3 classes
 
 @author: mgesteiro
 """

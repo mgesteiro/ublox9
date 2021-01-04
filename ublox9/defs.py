@@ -1,5 +1,9 @@
 """
 ublox9 package basic definitions
+
+Reference documents:
+ZED-F9P - Interface Description - https://www.u-blox.com/en/docs/UBX-18010854
+ZED-F9P - Integration manual - https://www.u-blox.com/en/docs/UBX-18010802
 """
 # u-blox generation 9 messages types
 MSG_NMEA = 2

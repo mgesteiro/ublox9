@@ -1,5 +1,9 @@
 """
 UBX protocol and messages handling definitions and functions.
+
+Reference documents:
+ZED-F9P - Interface Description - https://www.u-blox.com/en/docs/UBX-18010854
+ZED-F9P - Integration manual - https://www.u-blox.com/en/docs/UBX-18010802
 """
 UBX_DISABLED = b"\x00"  # False
 UBX_ENABLED = b"\x01"  # True
