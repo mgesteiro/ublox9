@@ -10,7 +10,7 @@ Created on 9 Dec 2020
 """
 import socket
 import time
-from ublox9 import Ublox9Stream, UBXMessage, UBX_CFG, UBX_ACK, MSG_NMEA, MSG_UBX, MSG_RTCM3
+from ublox9 import Ublox9Stream, UBXMessage, UBX_CFG, UBX_ACK, MSG_NMEA, MSG_UBX, MSG_RTCM3, MSG_UNKNOWN, to_u4
 from serial import Serial, SerialException, SerialTimeoutException
 
 UBX_ACK_VALSET = UBXMessage(
@@ -141,3 +141,5 @@ def get_message_type(message: bytes) -> int:
     if firstbye == b"$": return MSG_NMEA
     if firstbye == b"\xb5": return MSG_UBX
     if firstbye == b"\xd3": return MSG_RTCM3
+    return MSG_UNKNOWN
+

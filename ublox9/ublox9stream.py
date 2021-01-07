@@ -102,10 +102,14 @@ class Ublox9Stream:
                 # 1 X2 bitfield0: numData=10 bits(0..9), res1=6 bits (10..15) all 0
                 # 3 U1*numData data
                 # 3+numData U1[3] crc
-                header = read_byte + self._stream.read(2)
-                plen = int.from_bytes(header[-2:], byteorder="big", signed=False)
+                blen = self._stream.read(2)
+                plen = int.from_bytes(blen, byteorder="big", signed=False)
+                if plen > 1023:
+                    read_byte = blen[1:2]  # try to continue with the last read byte
+                    rembytes -= 2  # discard already read bytes
+                    continue
                 rest = self._stream.read(plen + 3)
-                return header + rest
+                return read_byte + blen + rest
 
             # unknown or unexpected byte: ignore it
             read_byte = self._stream.read(1)  # read next
