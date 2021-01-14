@@ -4,11 +4,15 @@ Created on 28 Nov 2020
 @author: mgesteiro
 """
 import setuptools
+import os
 
 from ublox9 import VERSION
 
-with open("README.md", "r") as f:
-    long_description = f.read()
+# just in case someone is invoking this script from a different directory
+rootfolder = os.path.dirname(os.path.realpath(__file__))
+os.chdir(rootfolder)
+
+long_description = open("README.md", "r").read()
 
 setuptools.setup(
     name="ublox9",
