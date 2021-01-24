@@ -5,6 +5,8 @@ Created on 27 Nov 2020
 
 @author: mgesteiro
 """
+from serial import Serial, SerialException, SerialTimeoutException
+from ublox9 import UBXMessage, UBX_SEC
 
 
 class Ublox9Stream:
@@ -46,8 +48,11 @@ class Ublox9Stream:
     @property
     def id(self) -> bytes:
         """
-        Getter for the stream identifier
+        Getter for the stream identifier. The first time it's read, it is
+        requested to the module via the get_uniqid() method.
         """
+        if not self._id:
+            self._id = self.get_uniqid()
         return self._id
 
     @id.setter
@@ -56,6 +61,23 @@ class Ublox9Stream:
         Setter for the stream identifier
         """
         self._id = newid
+
+    def get_uniqid(self) -> bytes:
+        """
+        Request the UNIQID identifier from the u-blox module
+
+        :return: the UNIQID of the module, empty if it fails
+        """
+        # try to obtain u-blox uniqid via UBX-SEC-UNIQID message
+        muniqid = UBXMessage(UBX_SEC["UBX-SEC-UNIQID"])
+        try:
+            self.write_message(muniqid.message_bytes())
+            bansw = self.read_ubxmessage(discardlimit=30, maxsearchbytes=100)
+            answ = UBXMessage.parse_bytes(bansw)
+            if answ and (answ['message'] == 'UBX-SEC-UNIQID'):
+                return answ['uniqueId']
+        except (SerialException, SerialTimeoutException, ValueError):
+            return b''
 
     def read_message(self, maxsearchbytes=128) -> bytes:
         """

@@ -77,7 +77,7 @@ class UBXMessage:
         if content[0:2] != UBXMessage.SIGNATURE: return result
         name = UBXMessage.get_classid_name(content[2:4])
         if not name: return result  # unrecognized message definition
-        result['message'] = name.encode()  # bytes format as the other fields
+        result['message'] = name
         result['length'] = int.from_bytes(content[4:6], byteorder="little", signed=False)
         index = 6  # start from the payload initial byte
         try:

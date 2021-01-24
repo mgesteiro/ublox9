@@ -69,31 +69,27 @@ class StreamToTCP:
         self._socket.close()
 
 
-def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
+def open_serial(serialport: str, baudrates: list, timeout=1) -> Ublox9Stream:
     """
     try to open a serial port with different baudrates and check that there is
-    a valid communication with the ublox module (sending UBX-SEC-UNIQID message)
-    if a valid connection is achieved, the id property of the resulting object
-    is populated with the u-blox module UNIQID.
+    valid communication with the ublox module checking the id property (that
+    gets populated on the fly).
 
     :param serialport: the device port to open
     :param baudrates: a list of baudrates to try
     :param timeout: timeout in seconds
     :return: an Ublox9Stream if successfull, None otherwise
     """
-    unique = b"\xb5\x62\x27\x03\x00\x00\x2a\xa5"
     for baudrate in baudrates:
         try:
             sport = Serial(serialport, baudrate, timeout=timeout)
             ub9stream = Ublox9Stream(sport)
-            ub9stream.write_message(unique)
-            answ = ub9stream.read_ubxmessage(discardlimit=30, maxsearchbytes=100)
-            if answ and (answ[:6] == b'\xb5\x62\x27\x03\x09\x00'):
-                ub9stream.id = answ[10:15]
+            # check if we had valid communications
+            if ub9stream.id:  # id gets populated on the fly (property)
                 return ub9stream
             else:
                 sport.close()
-                time.sleep(0.250)
+                time.sleep(0.040)  # 40 ms
         except (SerialException, SerialTimeoutException, ValueError):
             pass
 
@@ -101,7 +97,7 @@ def open_serial(serialport, baudrates, timeout=1) -> Ublox9Stream:
 def gen_valset_message(layers: bytes, cfg_data: bytes) -> bytes:
     """
     creates an UBX-VALSET message with the specified values/keys (cfg_data)
-    to be written to the specified layer.
+    to be written to the specified layer(s).
     See https://www.u-blox.com/en/docs/UBX-18010854#page=86&zoom=auto,-70,496
 
     :param layers: which layers should be written the config to

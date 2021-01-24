@@ -76,6 +76,30 @@ UBX_PAYLOADS = {
         "cfgData": ("RP", U1)  # 4 + n U1 - - Configuration data  (key and value pairs)
     },
 
+    # https://www.u-blox.com/en/docs/UBX-18010854#page=116&zoom=auto,-70,548
+    "UBX-MON-COMMS": {
+        "version": U1,  # 0 U1 - - Message version (0x00 for this version)
+        "nPorts": U1,  # 1 U1 - - Number of ports included
+        "txErrors": 1,  # 2 X1 - - TX error bitmask bit 0 U :1 mem - - Memory Allocation error bit 1 U :1 alloc - - Allocation error (TX buffer full)
+        "reserved0": U1,  # 3 U1 - - Reserved
+        "protIds": 4,  # 4 U1[4] - The  identifiers of the protocols reported in the msgs array. 0: UBX, 1: NMEA, 2: RTCM2, 5: RTCM3, 0xFF: No protocol reported.
+        "ports": ("PN", ("nPorts", {
+            "portId": U2,  # 8 + n·40 U2 - - Unique  identifier  for  the  port.  See  section Communications   ports   in    Integration   manual    for details.
+            "txPending": U2,  # 10 + n·40 U2 - bytes Number of bytes pending in transmitter buffer
+            "txBytes": U4,  # 12 + n·40 U4 - bytes Number of bytes ever sent
+            "txUsage": U1,  # 16 + n·40 U1 - % Maximum  usage  transmitter  buffer  during  the  last sysmon period
+            "txPeakUsage": U1,  # 17 + n·40 U1 - % Maximum usage transmitter buffer
+            "rxPending": U2,  # 18 + n·40 U2 - bytes Number of bytes in receiver buffer
+            "rxBytes": U4,  # 20 + n·40 U4 - bytes Number of bytes ever received
+            "rxUsage": U1,  # 24 + n·40 U1 - % Maximum   usage   receiver   buffer   during   the   last sysmon period
+            "rxPeakUsage": U1,  # 25 + n·40 U1 - % Maximum usage receiver buffer
+            "overrunErrs": U2,  # 26 + n·40 U2 - - Number of 100 ms timeslots with overrun errors
+            "msgs": 8,  # 28 + n·40 U2[4] - msg Number  of  successfully  parsed  messages  for  each protocol. The reported protocols are identified through the protIds field.
+            "reserved1": 8,  # 36 + n·40 U1[8] - - Reserved
+            "skipped": U4  # 44 + n·40 U4 - bytes Number of skipped bytes
+        }))
+    },
+
     # https://www.u-blox.com/en/docs/UBX-18010854#page=125&zoom=auto,-70,616
     "UBX-MON-VER": {
         "swVersion": 30,  # 0 CH[30] - - Nul-terminated software version string.
