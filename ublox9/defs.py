@@ -21,4 +21,5 @@ VALGET_DEFAULT = bytes([0b0111])  # 7
 VALSET_RAM = bytes([0b0001])  # 1
 VALSET_BBR = bytes([0b0010])  # 2
 VALSET_FLASH = bytes([0b0100])  # 4
+VALSET_RAMFLASH = bytes([0b0101])  # 5
 VALSET_ALL = bytes([0b0111])  # 7

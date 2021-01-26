@@ -82,7 +82,7 @@ def open_serial(serialport: str, baudrates: list, timeout=1) -> Ublox9Stream:
     """
     for baudrate in baudrates:
         try:
-            sport = Serial(serialport, baudrate, timeout=timeout)
+            sport = Serial(serialport, baudrate, timeout=timeout, write_timeout=timeout)
             ub9stream = Ublox9Stream(sport)
             # check if we had valid communications
             if ub9stream.id:  # id gets populated on the fly (property)
